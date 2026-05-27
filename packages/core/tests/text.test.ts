@@ -7,6 +7,7 @@ import {
   between,
   betweenChomp,
   chunkByLength,
+  hash,
   omitChars,
   startsEnds,
   wildcard,
@@ -167,5 +168,26 @@ describe(`text`, () => {
 
     // @ts-expect-error  asdf asdf
     expect(() => betweenChomp(``, `st`, {})).toThrow();
+  });
+
+  it(`hash`, () => {
+    const strings = [`hello`, `world`, `some string`, ``, `hello `, `HELLO`, `123`, `!@#$%^&*()`, `The quick brown fox jumps over the lazy dog`];
+    const values = new Set<number>();
+    for (const str of strings) {
+      const v1 = hash(str);
+      // Check for collisions in this small set of strings
+      if (values.has(v1)) {
+        throw new Error(`Hash collision detected for string: "${str}" with hash value: ${v1}`);
+      }
+      values.add(v1);
+
+      // Check that hash function is consistent
+      const v2 = hash(str);
+      expect(v1).toBe(v2);
+
+      // Check it is within range
+      expect(v1).toBeGreaterThanOrEqual(0);
+      expect(v1).toBeLessThan(1);
+    }
   });
 });
