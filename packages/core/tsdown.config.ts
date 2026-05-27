@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown/config';
 
 export default defineConfig({
-  entry: [`./src/index.ts`, `./src/records.ts`, `./src/maps.ts`, `./src/trackers.ts`, `./src/text.ts`, `./src/continuously.ts`, `./src/elapsed.ts`],
+  entry: [`./src/index.ts`, `./src/records.ts`, `./src/maps.ts`, `./src/trackers.ts`, `./src/text.ts`, `./src/continuously.ts`, `./src/elapsed.ts`, `./src/is-equal.ts`],
   deps: {
     neverBundle: [`node:module`],
   },
