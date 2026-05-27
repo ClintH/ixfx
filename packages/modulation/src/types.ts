@@ -1,4 +1,5 @@
 import type { HasCompletion } from "@ixfx/core";
+import type { Tokeniser } from "@ixfx/core/text-tokenise.js";
 import type { BasicInterpolateOptions } from "@ixfx/numbers";
 import type { EasingName } from './easing.js';
 /**
@@ -24,8 +25,17 @@ import type { EasingName } from './easing.js';
  * `interpolatorInterval` will still step through the interpolation range of 0..1 in an orderly fashion, but we're transforming that range using a custom function before producing the result.
  *
  */
-export type InterpolateOptions = BasicInterpolateOptions & {
+export type InterpolateOptions = Partial<BasicInterpolateOptions> & {
   easing: EasingName;
+};
+export type BooleanInterpolateOptions = Partial<InterpolateOptions> & Partial<{ threshold: number }>;
+
+export type CenteredStringInterpolationOptions = Tokeniser;
+
+export type StringInterpolateOptions = Partial<InterpolateOptions> & {
+  style: `token` | `centered` | `human`;
+  tokenise?: `character` | `word`;
+  tokeniser?: Tokeniser;
 };
 
 export type ModSettableOptions = {
