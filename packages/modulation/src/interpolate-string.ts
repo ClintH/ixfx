@@ -1,15 +1,8 @@
-import type { Tokeniser } from "@ixfx/core/text-tokenise.js";
-import type { InterpolateOptions } from "./types.js";
+import type { CenteredStringInterpolationOptions, StringInterpolateOptions } from "./types.js";
 import { Compare, Tokenise } from '@ixfx/core/text';
 import { numberTest, resultThrow, stringTest } from "@ixfx/guards";
 import { clamp } from "@ixfx/numbers";
 import { get as getEasing } from './easing.js';
-
-export type StringInterpolateOptions = Partial<InterpolateOptions> & {
-  style: `token` | `centered` | `human`;
-  tokenise?: `character` | `word`;
-  tokeniser?: Tokeniser;
-};
 
 export function interpolateString(amount: number, options?: Partial<StringInterpolateOptions>): (a: string, b: string) => string;
 export function interpolateString(amount: number, a: string, b: string, options?: Partial<StringInterpolateOptions>): string;
@@ -166,12 +159,10 @@ export function interpolatorByTokens(
   };
 }
 
-export type CenteredInterpolationOptions = Tokeniser;
-
 export function interpolatorCentered(
   a: string,
   b: string,
-  options: CenteredInterpolationOptions = Tokenise.byCharacter(),
+  options: CenteredStringInterpolationOptions = Tokenise.byCharacter(),
 ): (amount: number) => string {
   if (typeof a !== `string`)
     throw new TypeError(`Param 'a' is not a string. Got: ${typeof a}`);
