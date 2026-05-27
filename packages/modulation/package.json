@@ -1,25 +1,25 @@
 {
   "name": "@ixfx/modulation",
-  "version": "0.56.12",
-  "license": "MIT",
   "type": "module",
-  "sideEffects": false,
-  "files": [
-    "dist"
+  "version": "0.56.12",
+  "description": "ixfx modulation",
+  "author": "Clint Heyer <clint@thestaticvoid.net>",
+  "license": "MIT",
+  "homepage": "https://ixfxfun.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clinth/ixfx.git",
+    "directory": "packages/modulation"
+  },
+  "bugs": {
+    "url": "https://github.com/clinth/ixfx/issues"
+  },
+  "keywords": [
+    "ixfx",
+    "interactivity",
+    "modulation"
   ],
-  "scripts": {
-    "package-bundle": "tsdown",
-    "clean": "rm -rf dist && rm -rf bundle"
-  },
-  "dependencies": {
-    "@ixfx/core": "workspace:*",
-    "@ixfx/events": "workspace:*",
-    "@ixfx/geometry": "workspace:*",
-    "@ixfx/numbers": "workspace:*",
-    "@ixfx/guards": "workspace:*",
-    "@ixfx/random": "workspace:*",
-    "@ixfx/flow": "workspace:*"
-  },
+  "sideEffects": false,
   "exports": {
     ".": {
       "dev": "./src/index.ts",
@@ -50,23 +50,23 @@
     }
   },
   "types": "./dist/index.d.ts",
-  "description": "ixfx modulation",
-  "keywords": [
-    "ixfx",
-    "interactivity",
-    "modulation"
+  "files": [
+    "dist"
   ],
-  "homepage": "https://ixfxfun.dev",
-  "bugs": {
-    "url": "https://github.com/clinth/ixfx/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/clinth/ixfx.git",
-    "directory": "packages/modulation"
-  },
-  "author": "Clint Heyer <clint@thestaticvoid.net>",
   "engines": {
     "node": ">=24.0.0"
+  },
+  "scripts": {
+    "package-bundle": "tsdown",
+    "clean": "rm -rf dist && rm -rf bundle"
+  },
+  "dependencies": {
+    "@ixfx/core": "workspace:*",
+    "@ixfx/events": "workspace:*",
+    "@ixfx/flow": "workspace:*",
+    "@ixfx/geometry": "workspace:*",
+    "@ixfx/guards": "workspace:*",
+    "@ixfx/numbers": "workspace:*",
+    "@ixfx/random": "workspace:*"
   }
 }
