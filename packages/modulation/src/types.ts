@@ -1,60 +1,87 @@
-import type { HasCompletion } from "@ixfx/core"
-
+import type { HasCompletion } from "@ixfx/core";
+import type { BasicInterpolateOptions } from "@ixfx/numbers";
+import type { EasingName } from './easing.js';
+/**
+ * Interpolation options.
+ *
+ * Limit: What to do if interpolation amount exceeds 0..1 range
+ * clamp: lock to A & B (inclusive) Default.
+ * wrap: wrap from end to start again
+ * ignore: allow return values outside of A..B range
+ *
+ * Easing: name of easing function for non-linear interpolation
+ *
+ * Transform: name of function to transform `amount` prior to interpolate. This is useful for creating non-linear interpolation results.
+ *
+ * For example:
+ * ```js
+ * // Divide interpolation amount in half
+ * const interpolatorInterval({ mins: 1 }, 10, 100, {
+ *  transform: (amount) => amount * Math.random()
+ * });
+ * ```
+ * In the above example, the results would get more random over time.
+ * `interpolatorInterval` will still step through the interpolation range of 0..1 in an orderly fashion, but we're transforming that range using a custom function before producing the result.
+ *
+ */
+export type InterpolateOptions = BasicInterpolateOptions & {
+  easing: EasingName;
+};
 
 export type ModSettableOptions = {
   /**
    * Starting absolute value of source.
    */
-  startAt: number
+  startAt: number;
   /**
    * Starting relative value of source (eg 0.5 for 50%)
    */
-  startAtRelative: number
+  startAtRelative: number;
   /**
    * If set, determines how many cycles. By default unlimited.
    * Use 1 for example for a one-shot wave.
    */
-  cycleLimit: number
+  cycleLimit: number;
   /**
    * Function that returns current time in milliseconds.
    * Defaults to `performance.now`. Useful for testing.
    */
-  timeSource: () => number
-}
+  timeSource: () => number;
+};
 
 export type ModSettableFeedback = {
   /**
    * If set, resets absolute position of clock
    */
-  resetAt: number
+  resetAt: number;
   /**
    * If set, resets relative position of clock
    */
-  resetAtRelative: number
-}
+  resetAtRelative: number;
+};
 
-export type ModSettable = (feedback?: Partial<ModSettableFeedback>) => number
+export type ModSettable = (feedback?: Partial<ModSettableFeedback>) => number;
 
 /**
  * A mod source returns numbers on a 0..1 scale.
  * Usually invoked just a function, some sources also support
  * 'feedback' allowing source to be adjusted dynamically.
- * 
+ *
  * See Modulation.Sources for more.
  */
 
-export type ModSource = (feedback?: any) => number
+export type ModSource = (feedback?: any) => number;
 
 /**
  * A function that modulates `v`.
- * 
+ *
  * Example modulators:
- * * {@link wave}: Generate different wave shapes
- * * Raw access to waves: {@link arcShape}, {@link sineShape},{@link sineBipolarShape}, {@link triangleShape}, {@link squareShape}
- * * {@link Easings}: Easing functions
- * * {@link springShape}: Spring
+ * {@link wave}: Generate different wave shapes
+ * Raw access to waves: {@link arcShape}, {@link sineShape},{@link sineBipolarShape}, {@link triangleShape}, {@link squareShape}
+ * {@link Easings}: Easing functions
+ * {@link springShape}: Spring
  */
-export type ModFunction = (v: number) => number
+export type ModFunction = (v: number) => number;
 
 export type ModulatorTimed = HasCompletion & {
   /**
@@ -62,12 +89,12 @@ export type ModulatorTimed = HasCompletion & {
    *
    * @returns {number}
    */
-  compute(): number;
+  compute: () => number;
 
   /**
    * Reset the easing
    */
-  reset(): void;
+  reset: () => void;
   /**
    * Returns true if the easing is complete
    *
@@ -78,7 +105,7 @@ export type ModulatorTimed = HasCompletion & {
 
 export type SpringOptions = Partial<{
   /**
-   * How much 'weight' the spring has. 
+   * How much 'weight' the spring has.
    * Favour adjusting 'damping' or 'stiffness' before changing mass.
    * Default: 1
    */
