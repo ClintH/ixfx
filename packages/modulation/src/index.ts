@@ -5,6 +5,8 @@ export type * from './easing/types.js';
 export * as Envelopes from './envelope.js';
 export * as Forces from './forces.js';
 export * from './gaussian.js';
+export * from './interpolate-object.js';
+export * from './interpolate-string.js';
 export * from './interpolate.js';
 export * from './jitter.js';
 export * from './mix.js';
