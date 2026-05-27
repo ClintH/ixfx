@@ -1,6 +1,6 @@
-import type { StringInterpolateOptions } from '../src/interpolate-string.js';
-import { Tokenise } from '@ixfx/core/text';
+import type { StringInterpolateOptions } from '../src/types.js';
 
+import { Tokenise } from '@ixfx/core/text';
 import { describe, expect, it } from 'vitest';
 import { interpolateString, interpolatorByTokens, interpolatorCentered, interpolatorHuman } from '../src/interpolate-string.js';
 
