@@ -1,6 +1,11 @@
 A rough changelog between NPM releases
 
 
+@ixfx/modulation
++ interpolatorBoolean: Interpolate boolean values
++ interpolatorString: A few ways of interpolating between two strings
++ interpolatorObject: Interpolate an object with properties
+
 @ixfx/flow
 * Improved typing of 'debounce'. New callback-based pattern to get result of wrapped function.
 
