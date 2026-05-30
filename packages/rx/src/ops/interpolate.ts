@@ -1,27 +1,28 @@
+import type { InterpolateOptions } from "@ixfx/modulation";
 import type { ReactiveOrSource, ReactivePingable } from "../types.js";
-import { interpolate as interpolateFunction, type InterpolateOptions } from "@ixfx/modulation";
+import { interpolate as interpolateFunction } from "@ixfx/modulation";
 import { computeWithPrevious } from "./compute-with-previous.js";
 
 export type OpInterpolateOptions = InterpolateOptions & {
-  amount: number
+  amount: number;
   /**
    * Percentage of value that we consider 'done'.
    * Since interpolation can never converge to target exactly, this allows us to snap to completion.
    * Default: 0.99, meaning if value gets to within 99%, return the target.
    */
-  snapAt: number
-}
+  snapAt: number;
+};
 
 /**
  * Interpolates to the source value.
- * 
+ *
  * Outputs one value for every input value. Thus, to interpolation
  * over time, it's necessary to get the source to emit values at the desired rate.
- * 
+ *
  * Options can specify an easing name or custom transform of easing progress.
- * @param input 
- * @param options 
- * @returns 
+ * @param input
+ * @param options
+ * @returns
  */
 export function interpolate(input: ReactiveOrSource<number>, options: Partial<OpInterpolateOptions> = {}): ReactivePingable<number> {
   const amount = options.amount ?? 0.1;
@@ -32,12 +33,12 @@ export function interpolate(input: ReactiveOrSource<number>, options: Partial<Op
   return computeWithPrevious<number>(input, (previous, target) => {
     const v = index(previous, target);
     if (target > previous) {
-      if (v / target >= snapAt) return target;
+      if (v / target >= snapAt)
+        return target;
     }
     return v;
   });
 }
-
 
 /**
  * From the basis of an input stream of values, run a function over

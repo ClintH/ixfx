@@ -4,6 +4,7 @@ import { to } from "@ixfx/flow/state-machine/state-machine-fns.js";
 import { Points } from "@ixfx/geometry";
 import { resultThrow } from "@ixfx/guards";
 import { applyBounds } from "./apply-bounds.js";
+import { distanceRowwise } from "./distance.js";
 import { cells } from "./enumerators/cells.js";
 import { CellPlaceholder, isJaggedGrid, testCell, testGrid } from "./guards.js";
 import { offset } from "./offset.js";

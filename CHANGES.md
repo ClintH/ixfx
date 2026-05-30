@@ -1,5 +1,6 @@
 A rough changelog between NPM releases
 
+# 2026.05.30
 
 @ixfx/modulation
 + interpolatorBoolean: Interpolate boolean values
@@ -14,6 +15,7 @@ A rough changelog between NPM releases
 
 @ixfx/geometry
 + Grids.GridSelection: logic for cursor and selection in a logical grid
+* Improveents in arc length calculation
 
 # 2026.05.05
 

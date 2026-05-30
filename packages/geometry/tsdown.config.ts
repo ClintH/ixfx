@@ -15,6 +15,7 @@ export default defineConfig({
     `./src/triangle/index.ts`,
     `./src/layout.ts`,
     `./src/index.ts`,
+    `./src/angles.ts`,
   ],
   deps: {
     neverBundle: [`node:module`],

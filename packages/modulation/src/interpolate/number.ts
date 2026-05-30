@@ -1,10 +1,9 @@
 import type { Interval } from "@ixfx/core";
-import type { BooleanInterpolateOptions, InterpolateOptions } from "./types.js";
+import type { InterpolateOptions } from "./types.js";
 import { ofTotal } from "@ixfx/flow";
 import { numberTest, resultThrow } from '@ixfx/guards';
-import { clamp, wrap } from "@ixfx/numbers";
-import { get as getEasing } from './easing.js';
-import { piPi } from "./util/pi-pi.js";
+import { clamp } from "@ixfx/numbers";
+import { get as getEasing } from '../easing.js';
 
 /**
  * Returns an interpolation function with a fixed interpolation amount. This
@@ -224,22 +223,6 @@ export function interpolatorStepped(incrementAmount: number, a = 0, b = 1, start
 }
 
 /**
- * Interpolate between angles `a` and `b` by `amount`. Angles are in radians.
- *
- * ```js
- * interpolateAngle(0.5, Math.PI, Math.PI/2);
- * ```
- * @param amount
- * @param aRadians Start angle (radian)
- * @param bRadians End angle (radian)
- * @returns Interpolated angle (radian)
- */
-export function interpolateAngle(amount: number, aRadians: number, bRadians: number, options?: Partial<InterpolateOptions>): number {
-  const t = wrap(bRadians - aRadians, 0, piPi);
-  return interpolate(amount, aRadians, aRadians + (t > Math.PI ? t - piPi : t), options);
-}
-
-/**
  * Interpolates between A->B over `duration`.
  * Given the same A & B values, steps will be larger if it's a longer
  * duration, and shorter if it's a smaller duration.
@@ -279,44 +262,5 @@ export function interpolatorInterval(duration: Interval, a = 0, b = 1, options?:
       return b;
     const value = interpolate(amount, a, b, options);
     return value;
-  };
-}
-
-/**
- * Returns an interpolator function between two boolean values.
- *
- * Defaults to 0.5 as the threshold:
- * ```js
- * const i = interpolatorBoolean(false, true);
- * i(0); // false
- * i(0.5); // true
- * i(0.6); // true
- * ```
- *
- * You can also specify a different threshold:
- * ```js
- * const i = interpolatorBoolean(false, true, { threshold: 0.8 });
- * i(0.7); // false
- * i(0.8); // true
- * i(0.9); // true
- * ```
- *
- * @param a
- * @param b
- * @param options
- * @returns Interpolator function
- */
-export function interpolatorBoolean(a: boolean, b: boolean, options?: BooleanInterpolateOptions): (amount: number) => boolean {
-  const threshold = options?.threshold ?? 0.5;
-  return (amount: number) => {
-    const processedAmount = options?.easing ? getEasing(options.easing)?.(amount) ?? amount : amount;
-    if (processedAmount === undefined)
-      throw new Error(`Easing function '${options?.easing}' not found`);
-    if (options?.transform) {
-      if (typeof options.transform !== `function`)
-        throw new Error(`Param 'transform' is expected to be a function. Got: ${typeof options.transform}`);
-      return options.transform(amount) < 0.5 ? a : b;
-    }
-    return processedAmount < threshold ? a : b;
   };
 }

@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { test, expect } from 'vitest';
-import { interpolate, interpolateAngle, interpolatorStepped } from '../src/interpolate.js';
+import { expect, it } from 'vitest';
+import { interpolate, interpolatorStepped } from '../src/interpolate.js';
 import { round } from '../src/round.js';
 
-test(`basic`, () => {
+it(`basic`, () => {
   expect(interpolate(0, 0, 100)).toBe(0);
   expect(interpolate(0.5, 0, 100)).toBe(50);
   expect(interpolate(1, 0, 100)).toBe(100);
@@ -22,21 +21,14 @@ test(`basic`, () => {
   expect(f(0.5)).toBe(50);
   expect(f(1)).toBe(100);
 
-  // @ts-expect-error
+  // @ts-expect-error asdf asd f
   expect(() => interpolate(false)).toThrow();
 
-  // @ts-expect-error
+  // @ts-expect-error asdfa sadf as df
   expect(() => interpolate(10, { transform: null })(10, 20)).toThrow();
-
 });
 
-// test(`angle`, () => {
-//   expect(interpolateAngle(1, 0, Math.PI * 2)).toEqual(0);
-//   expect(interpolateAngle(0, 0, Math.PI * 2)).toEqual(0);
-//   expect(interpolateAngle(0.5, 0, Math.PI * 2)).toEqual(Math.PI);
-
-// })
-test(`limits`, () => {
+it(`limits`, () => {
   // Default is clamp
   expect(interpolate(1.1, 0, 100)).toBe(100);
   expect(interpolate(-0.1, 0, 100)).toBe(0);
@@ -60,16 +52,17 @@ test(`limits`, () => {
   expect(interpolate(1, 0, 100, { limits: `wrap` })).toBe(100);
 });
 
-test(`interpolatorStepped`, () => {
+it(`interpolatorStepped`, () => {
   const v = interpolatorStepped(0.1, 100, 200);
   const values: number[] = [];
   while (true) {
     const value = v();
     values.push(value);
-    if (value >= 200) break;
+    if (value >= 200)
+      break;
   }
   expect(values.length).toBe(12);
-  expect(values[ 0 ]).toBe(100);
+  expect(values[0]).toBe(100);
   expect(values.at(-1)).toBe(200);
 
   // Re-targeting

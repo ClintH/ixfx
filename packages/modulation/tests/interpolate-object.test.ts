@@ -1,6 +1,6 @@
 import * as Points from '@ixfx/geometry/point';
 import { describe, expect, it } from 'vitest';
-import { interpolatorObject } from '../src/interpolate-object.js';
+import { interpolatorObject } from '../src/interpolate/object.js';
 
 describe(`interpolatorObject`, () => {
   const testA = {

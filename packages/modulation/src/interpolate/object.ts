@@ -1,8 +1,8 @@
-import { interpolateString } from "./interpolate-string.js";
-import { interpolate as interpolateNumber, interpolatorBoolean } from "./interpolate.js";
+import { interpolateString } from "./string.js";
+import { interpolate as interpolateNumber } from "./number.js";
 import {isEqualValueDefault} from "@ixfx/core/is-equal";
-import * as Points from "@ixfx/geometry/point";
 import { BooleanInterpolateOptions, InterpolateOptions, StringInterpolateOptions } from "./types.js";
+import { interpolatorBoolean } from "./boolean.js";
 
 export type InterpolateObjectOptions<T> = {
   useFallbacks?:boolean;

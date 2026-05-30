@@ -6,6 +6,7 @@ export default defineConfig({
     `./src/easing.ts`,
     `./src/source.ts`,
     `./src/envelope.ts`,
+    `./src/interpolate/index.ts`,
   ],
   deps: {
     neverBundle: [`node:module`],

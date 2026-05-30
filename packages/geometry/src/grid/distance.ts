@@ -9,7 +9,7 @@ export function distance(a: GridCell, b: GridCell, grid: Grid, logic = `rowwise`
   }
 }
 
-function distanceRowwise(a: GridCell, b: GridCell, grid: Grid): number {
+export function distanceRowwise(a: GridCell, b: GridCell, grid: Grid): number {
   if (isJaggedGrid(grid)) {
     throw new Error(`Jagged grids are not supported yet`);
   } else {

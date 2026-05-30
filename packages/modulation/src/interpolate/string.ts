@@ -2,7 +2,7 @@ import type { CenteredStringInterpolationOptions, StringInterpolateOptions } fro
 import { Compare, Tokenise } from '@ixfx/core/text';
 import { numberTest, resultThrow, stringTest } from "@ixfx/guards";
 import { clamp } from "@ixfx/numbers";
-import { get as getEasing } from './easing.js';
+import { get as getEasing } from '../easing.js';
 
 export function interpolateString(amount: number, options?: Partial<StringInterpolateOptions>): (a: string, b: string) => string;
 export function interpolateString(amount: number, a: string, b: string, options?: Partial<StringInterpolateOptions>): string;
