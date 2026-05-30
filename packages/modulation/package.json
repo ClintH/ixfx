@@ -1,7 +1,7 @@
 {
   "name": "@ixfx/modulation",
   "type": "module",
-  "version": "0.56.12",
+  "version": "0.56.13",
   "description": "ixfx modulation",
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "license": "MIT",
@@ -33,6 +33,10 @@
       "dev": "./src/envelope.ts",
       "default": "./dist/envelope.js"
     },
+    "./interpolate": {
+      "dev": "./src/interpolate/index.ts",
+      "default": "./dist/interpolate/index.js"
+    },
     "./source": {
       "dev": "./src/source.ts",
       "default": "./dist/source.js"
@@ -45,6 +49,7 @@
       ".": "./dist/index.js",
       "./easing": "./dist/easing.js",
       "./envelope": "./dist/envelope.js",
+      "./interpolate": "./dist/interpolate/index.js",
       "./source": "./dist/source.js",
       "./package.json": "./package.json"
     }

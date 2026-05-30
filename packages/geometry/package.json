@@ -1,6 +1,6 @@
 {
   "name": "@ixfx/geometry",
-  "version": "0.56.12",
+  "version": "0.56.13",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -25,6 +25,10 @@
     ".": {
       "dev": "./src/index.ts",
       "default": "./dist/index.js"
+    },
+    "./angles": {
+      "dev": "./src/angles.ts",
+      "default": "./dist/angles.js"
     },
     "./arc": {
       "dev": "./src/arc/index.ts",
@@ -80,6 +84,7 @@
     "access": "public",
     "exports": {
       ".": "./dist/index.js",
+      "./angles": "./dist/angles.js",
       "./arc": "./dist/arc/index.js",
       "./bezier": "./dist/bezier/index.js",
       "./circle": "./dist/circle/index.js",
