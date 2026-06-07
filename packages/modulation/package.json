@@ -1,7 +1,7 @@
 {
   "name": "@ixfx/modulation",
   "type": "module",
-  "version": "0.56.13",
+  "version": "0.56.14",
   "description": "ixfx modulation",
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "license": "MIT",

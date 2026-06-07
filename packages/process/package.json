@@ -1,6 +1,6 @@
 {
   "name": "@ixfx/process",
-  "version": "0.56.13",
+  "version": "0.56.14",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
