@@ -1,6 +1,6 @@
 {
 	"name": "ixfx",
-	"version": "1.37.2",
+	"version": "1.38.1",
 	"description": "Bundle of ixfx libraries",
 	"author": "Clint Heyer <clint@thestaticvoid.net>",
 	"homepage": "https://ixfx.fun/",
@@ -24,7 +24,7 @@
 		"prepare": "pnpm run clean && pnpm run build",
 		"attw": "attw --pack . --format ascii --profile esm-only",
 		"verify_": "publint",
-		"full": "pnpm run clean && pnpm run build && pnpm run publish"
+		"full": "pnpm run clean && pnpm run build && npm publish"
 	},
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
@@ -33,7 +33,7 @@
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js"
 		},
-		"./*": {
+		"./*.js": {
 			"types": "./dist/*.d.ts",
 			"import": "./dist/*.js"
 		},
@@ -41,11 +41,13 @@
 			"types": "./dist/min/index.d.ts",
 			"import": "./dist/min/index.js"
 		},
-		"./min/*": {
+		"./min/*.js": {
 			"types": "./dist/min/*.d.ts",
 			"import": "./dist/min/*.js"
-		}
+		},
+		"./package.json": "./package.json"
 	},
+	"unpkg": "./dist/index.js",
 	"devDependencies": {
 		"@arethetypeswrong/cli": "catalog:",
 		"@ixfx/arrays": "workspace:*",
