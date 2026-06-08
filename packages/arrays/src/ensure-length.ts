@@ -1,17 +1,16 @@
-
 export function ensureLength<V>(
   data: readonly V[] | V[],
   length: number,
   expand: `repeat` | `first` | `last`,
-  truncate?: `from-end` | `from-start`
+  truncate?: `from-end` | `from-start`,
 ): (V)[];
 
 export function ensureLength<V>(
   data: readonly V[] | V[],
   length: number,
   expand?: `undefined`,
-  truncate?: `from-end` | `from-start`
-): (V | undefined)[];
+  truncate?: `from-end` | `from-start`,
+): Array<V | undefined>;
 
 /**
  * Returns a copy of an array with specified length - padded or truncated as needed.
@@ -26,7 +25,7 @@ export function ensureLength<V>(
  * ```js
  * ensureLength([1,2,3], 2); // [1,2]
  * ```
- * 
+ *
  * Padded:
  * ```js
  * ensureLength([1,2,3], 5, `undefined`); // [1,2,3,undefined,undefined]
@@ -44,11 +43,14 @@ export function ensureLength<V>(
   data: readonly V[] | V[],
   length: number,
   expandStrategy: `undefined` | `repeat` | `first` | `last` = `undefined`,
-  truncateStrategy: `from-end` | `from-start` = `from-end`
-): (V | undefined)[] {
-  if (data === undefined) throw new Error(`Data undefined`);
-  if (!Array.isArray(data)) throw new Error(`data is not an array`);
-  if (data.length === length) return [ ...data ];
+  truncateStrategy: `from-end` | `from-start` = `from-end`,
+): Array<V | undefined> {
+  if (data === undefined)
+    throw new Error(`Data undefined`);
+  if (!Array.isArray(data))
+    throw new Error(`data is not an array`);
+  if (data.length === length)
+    return [...data];
   if (data.length > length) {
     if (truncateStrategy === `from-end`) {
       return data.slice(0, length);
@@ -56,7 +58,7 @@ export function ensureLength<V>(
       return data.slice(data.length - length);
     }
   }
-  const d = [ ...data ];
+  const d = [...data];
   const add = length - d.length;
 
   for (let index = 0; index < add; index++) {
@@ -67,11 +69,11 @@ export function ensureLength<V>(
         break;
       }
       case `repeat`: {
-        d.push(data[ index % data.length ]);
+        d.push(data[index % data.length]);
         break;
       }
       case `first`: {
-        d.push(data[ 0 ]);
+        d.push(data[0]);
         break;
       }
       case `last`: {

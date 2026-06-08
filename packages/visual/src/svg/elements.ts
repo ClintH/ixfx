@@ -1,28 +1,28 @@
-
-//import type { CirclePositioned } from '../../geometry/circle/CircleType.js';
-//import type { Point } from '../../geometry/point/PointType.js';
-//import type { Line } from '../../geometry/line/LineType.js';
-//import * as Lines from '../geometry/line/index.js';
-import { Lines, Polar } from '@ixfx/geometry';
-//import * as Svg from './index.js';
-import { toStringFirst as ColourStringFirst } from '../colour/conversion.js';
-//import { getCssVariable } from '../colour/index.js';
-import type { CircleDrawingOpts, LineDrawingOpts, PathDrawingOpts, TextDrawingOpts, TextPathDrawingOpts } from './types.js';
-import { applyOpts } from './apply.js';
-import { applyStrokeOpts } from './stroke.js';
-import { createEl, createOrResolve } from './create.js';
-import { applyPathOpts } from './path.js';
 import type { CirclePositioned } from '@ixfx/geometry/circle';
 import type { Line } from '@ixfx/geometry/line';
 import type { Point } from '@ixfx/geometry/point';
-//import type { PolarRay } from 'src/geometry/polar/Types.js';
-//import { toCartesian as polarRayToCartesian } from 'src/geometry/polar/Ray.js';
-//import {Palette} from ".";
+// import { getCssVariable } from '../colour/index.js';
+import type { CircleDrawingOpts, LineDrawingOpts, PathDrawingOpts, TextDrawingOpts, TextPathDrawingOpts } from './types.js';
+// import type { CirclePositioned } from '../../geometry/circle/CircleType.js';
+// import type { Point } from '../../geometry/point/PointType.js';
+// import type { Line } from '../../geometry/line/LineType.js';
+// import * as Lines from '../geometry/line/index.js';
+import { Lines, Polar } from '@ixfx/geometry';
+// import * as Svg from './index.js';
+import { toStringFirst as ColourStringFirst } from '../colour/conversion.js';
+import { applyOpts } from './apply.js';
+import { createEl, createOrResolve } from './create.js';
+import { applyPathOpts } from './path.js';
+import { applyStrokeOpts } from './stroke.js';
+// import type { PolarRay } from 'src/geometry/polar/Types.js';
+// import { toCartesian as polarRayToCartesian } from 'src/geometry/polar/Ray.js';
+// import {Palette} from ".";
 
-const numberOrPercentage = (v: number): string => {
-  if (v >= 0 && v <= 1) return `${ v * 100 }%`;
+function numberOrPercentage(v: number): string {
+  if (v >= 0 && v <= 1)
+    return `${v * 100}%`;
   return v.toString();
-};
+}
 
 /**
  * Creates and adds an SVG path element
@@ -37,35 +37,28 @@ const numberOrPercentage = (v: number): string => {
  * @param svgOrArray Path syntax, or array of paths. Can be empty if path data will be added later
  * @param parent SVG parent element
  * @param opts Options Drawing options
- * @returns
  */
-export const path = (
-  svgOrArray: string | readonly string[],
-  parent: SVGElement,
-  opts?: PathDrawingOpts,
-  queryOrExisting?: string | SVGPathElement
-): SVGPathElement => {
+export function path(svgOrArray: string | readonly string[], parent: SVGElement, opts?: PathDrawingOpts, queryOrExisting?: string | SVGPathElement): SVGPathElement {
   const elem = createOrResolve<SVGPathElement>(
     parent,
     `path`,
-    queryOrExisting
+    queryOrExisting,
   );
-  const svg =
-    typeof svgOrArray === `string` ? svgOrArray : svgOrArray.join(`\n`);
+  const svg
+    = typeof svgOrArray === `string` ? svgOrArray : svgOrArray.join(`\n`);
 
   elem.setAttributeNS(null, `d`, svg);
   parent.append(elem);
   return pathUpdate(elem, opts);
-};
+}
 
-export const pathUpdate = (
-  elem: SVGPathElement,
-  opts?: PathDrawingOpts
-): SVGPathElement => {
-  if (opts) applyOpts(elem, opts);
-  if (opts) applyStrokeOpts(elem, opts);
+export function pathUpdate(elem: SVGPathElement, opts?: PathDrawingOpts): SVGPathElement {
+  if (opts)
+    applyOpts(elem, opts);
+  if (opts)
+    applyStrokeOpts(elem, opts);
   return elem;
-};
+}
 
 /**
  * Updates an existing `SVGCircleElement` with potentially updated circle data and drawing options
@@ -74,19 +67,17 @@ export const pathUpdate = (
  * @param opts Drawing options
  * @returns SVGCircleElement
  */
-export const circleUpdate = (
-  elem: SVGCircleElement,
-  circle: CirclePositioned,
-  opts?: CircleDrawingOpts
-): SVGCircleElement => {
+export function circleUpdate(elem: SVGCircleElement, circle: CirclePositioned, opts?: CircleDrawingOpts): SVGCircleElement {
   elem.setAttributeNS(null, `cx`, circle.x.toString());
   elem.setAttributeNS(null, `cy`, circle.y.toString());
   elem.setAttributeNS(null, `r`, circle.radius.toString());
-  if (opts) applyOpts(elem, opts);
-  if (opts) applyStrokeOpts(elem, opts);
+  if (opts)
+    applyOpts(elem, opts);
+  if (opts)
+    applyStrokeOpts(elem, opts);
 
   return elem;
-};
+}
 
 /**
  * Creates or reuses a `SVGCircleElement`.
@@ -96,21 +87,15 @@ export const circleUpdate = (
  * @param parent
  * @param opts
  * @param queryOrExisting
- * @returns
  */
-export const circle = (
-  circle: CirclePositioned,
-  parent: SVGElement,
-  opts?: CircleDrawingOpts,
-  queryOrExisting?: string | SVGCircleElement
-): SVGCircleElement => {
+export function circle(circle: CirclePositioned, parent: SVGElement, opts?: CircleDrawingOpts, queryOrExisting?: string | SVGCircleElement): SVGCircleElement {
   const p = createOrResolve<SVGCircleElement>(
     parent,
     `circle`,
-    queryOrExisting
+    queryOrExisting,
   );
   return circleUpdate(p, circle, opts);
-};
+}
 
 /**
  * Creates or resuses a `SVGGElement` (group)
@@ -119,21 +104,13 @@ export const circle = (
  * @param children
  * @param parent
  * @param queryOrExisting
- * @returns
  */
-export const group = (
-  children: readonly SVGElement[],
-  parent: SVGElement,
-  queryOrExisting?: string | SVGGElement
-): SVGGElement => {
+export function group(children: readonly SVGElement[], parent: SVGElement, queryOrExisting?: string | SVGGElement): SVGGElement {
   const p = createOrResolve<SVGGElement>(parent, `g`, queryOrExisting);
   return groupUpdate(p, children);
-};
+}
 
-export const groupUpdate = (
-  elem: SVGGElement,
-  children: readonly SVGElement[]
-): SVGGElement => {
+export function groupUpdate(elem: SVGGElement, children: readonly SVGElement[]): SVGGElement {
   for (const c of children) {
     if (c.parentNode !== elem) {
       elem.append(c);
@@ -141,7 +118,7 @@ export const groupUpdate = (
   }
 
   return elem;
-};
+}
 
 /**
  * Creates or reuses a SVGLineElement.
@@ -150,53 +127,48 @@ export const groupUpdate = (
  * @param parent
  * @param opts
  * @param queryOrExisting
- * @returns
  */
-export const line = (
-  line: Line,
-  parent: SVGElement,
-  opts?: LineDrawingOpts,
-  queryOrExisting?: string | SVGLineElement
-): SVGLineElement => {
+export function line(line: Line, parent: SVGElement, opts?: LineDrawingOpts, queryOrExisting?: string | SVGLineElement): SVGLineElement {
   const lineEl = createOrResolve<SVGLineElement>(
     parent,
     `line`,
-    queryOrExisting
+    queryOrExisting,
   );
   return lineUpdate(lineEl, line, opts);
-};
+}
 
 /**
  * Updates a SVGLineElement instance with potentially changed line and drawing data
  * @param lineEl
  * @param line
  * @param opts
- * @returns
  */
-export const lineUpdate = (
-  lineEl: SVGLineElement,
-  line: Line,
-  opts?: LineDrawingOpts
-): SVGLineElement => {
+export function lineUpdate(lineEl: SVGLineElement, line: Line, opts?: LineDrawingOpts): SVGLineElement {
   lineEl.setAttributeNS(null, `x1`, line.a.x.toString());
   lineEl.setAttributeNS(null, `y1`, line.a.y.toString());
   lineEl.setAttributeNS(null, `x2`, line.b.x.toString());
   lineEl.setAttributeNS(null, `y2`, line.b.y.toString());
-  if (opts) applyOpts(lineEl, opts);
-  if (opts) applyPathOpts(lineEl, opts);
-  if (opts) applyStrokeOpts(lineEl, opts);
+  if (opts)
+    applyOpts(lineEl, opts);
+  if (opts)
+    applyPathOpts(lineEl, opts);
+  if (opts)
+    applyStrokeOpts(lineEl, opts);
   return lineEl;
-};
+}
 
-export const polarRayUpdate = (lineEl: SVGLineElement, ray: Polar.PolarRay, opts?: LineDrawingOpts): SVGLineElement => {
+export function polarRayUpdate(lineEl: SVGLineElement, ray: Polar.PolarRay, opts?: LineDrawingOpts): SVGLineElement {
   const l = Polar.Ray.toCartesian(ray);
   lineEl.setAttributeNS(null, `x1`, l.a.x.toString());
   lineEl.setAttributeNS(null, `y1`, l.a.y.toString());
   lineEl.setAttributeNS(null, `x2`, l.b.x.toString());
   lineEl.setAttributeNS(null, `y2`, l.b.y.toString());
-  if (opts) applyOpts(lineEl, opts);
-  if (opts) applyPathOpts(lineEl, opts);
-  if (opts) applyStrokeOpts(lineEl, opts);
+  if (opts)
+    applyOpts(lineEl, opts);
+  if (opts)
+    applyPathOpts(lineEl, opts);
+  if (opts)
+    applyStrokeOpts(lineEl, opts);
   return lineEl;
 }
 
@@ -205,16 +177,14 @@ export const polarRayUpdate = (lineEl: SVGLineElement, ray: Polar.PolarRay, opts
  * @param el
  * @param text
  * @param opts
- * @returns
  */
-export const textPathUpdate = (
-  el: SVGTextPathElement,
-  text?: string,
-  opts?: TextPathDrawingOpts
-): SVGTextPathElement => {
-  if (opts?.method) el.setAttributeNS(null, `method`, opts.method);
-  if (opts?.side) el.setAttributeNS(null, `side`, opts.side);
-  if (opts?.spacing) el.setAttributeNS(null, `spacing`, opts.spacing);
+export function textPathUpdate(el: SVGTextPathElement, text?: string, opts?: TextPathDrawingOpts): SVGTextPathElement {
+  if (opts?.method)
+    el.setAttributeNS(null, `method`, opts.method);
+  if (opts?.side)
+    el.setAttributeNS(null, `side`, opts.side);
+  if (opts?.spacing)
+    el.setAttributeNS(null, `spacing`, opts.spacing);
   if (opts?.startOffset) {
     el.setAttributeNS(null, `startOffset`, numberOrPercentage(opts.startOffset));
   }
@@ -225,10 +195,12 @@ export const textPathUpdate = (
   if (text) {
     el.textContent = text;
   }
-  if (opts) applyOpts(el, opts);
-  if (opts) applyStrokeOpts(el, opts);
+  if (opts)
+    applyOpts(el, opts);
+  if (opts)
+    applyStrokeOpts(el, opts);
   return el;
-};
+}
 
 /**
  * Creates or reuses a SVGTextPathElement.
@@ -238,20 +210,13 @@ export const textPathUpdate = (
  * @param opts
  * @param textQueryOrExisting
  * @param pathQueryOrExisting
- * @returns
  */
-export const textPath = (
-  pathReference: string,
-  text: string,
-  parent: SVGElement,
-  opts?: TextPathDrawingOpts,
-  textQueryOrExisting?: string | SVGTextElement,
-  pathQueryOrExisting?: string | SVGTextPathElement
-): SVGTextPathElement => {
+export function textPath(pathReference: string, text: string, parent: SVGElement, opts?: TextPathDrawingOpts, textQueryOrExisting?: string | SVGTextElement, pathQueryOrExisting?: string | SVGTextPathElement): SVGTextPathElement {
   const textEl = createOrResolve<SVGTextElement>(
     parent,
     `text`,
-    textQueryOrExisting, `-text`
+    textQueryOrExisting,
+    `-text`,
   );
   // Update text properties, but don't pass in position or text
   textUpdate(textEl, undefined, undefined, opts);
@@ -259,11 +224,11 @@ export const textPath = (
   const p = createOrResolve<SVGTextPathElement>(
     textEl,
     `textPath`,
-    pathQueryOrExisting
+    pathQueryOrExisting,
   );
   p.setAttributeNS(null, `href`, pathReference);
   return textPathUpdate(p, text, opts);
-};
+}
 
 /**
  * Updates an existing SVGTextElement instance with position, text and drawing options
@@ -271,14 +236,8 @@ export const textPath = (
  * @param pos
  * @param text
  * @param opts
- * @returns
  */
-export const textUpdate = (
-  el: SVGTextElement,
-  pos?: Point,
-  text?: string,
-  opts?: TextDrawingOpts
-): SVGTextElement => {
+export function textUpdate(el: SVGTextElement, pos?: Point, text?: string, opts?: TextDrawingOpts): SVGTextElement {
   if (pos) {
     el.setAttributeNS(null, `x`, pos.x.toString());
     el.setAttributeNS(null, `y`, pos.y.toString());
@@ -289,10 +248,13 @@ export const textUpdate = (
 
   if (opts) {
     applyOpts(el, opts);
-    if (opts) applyStrokeOpts(el, opts);
+    if (opts)
+      applyStrokeOpts(el, opts);
 
-    if (opts.anchor) el.setAttributeNS(null, `text-anchor`, opts.anchor);
-    if (opts.align) el.setAttributeNS(null, `alignment-baseline`, opts.align);
+    if (opts.anchor)
+      el.setAttributeNS(null, `text-anchor`, opts.anchor);
+    if (opts.align)
+      el.setAttributeNS(null, `alignment-baseline`, opts.align);
 
     const userSelect = opts.userSelect ?? true;
 
@@ -301,31 +263,24 @@ export const textUpdate = (
     }
   }
   return el;
-};
+}
 
 /**
  * Creates or reuses a SVGTextElement
- * @param pos Position of text
  * @param text Text
  * @param parent
+ * @param pos Position of text
  * @param opts
  * @param queryOrExisting
- * @returns
  */
-export const text = (
-  text: string,
-  parent: SVGElement,
-  pos?: Point,
-  opts?: TextDrawingOpts,
-  queryOrExisting?: string | SVGTextElement
-): SVGTextElement => {
+export function text(text: string, parent: SVGElement, pos?: Point, opts?: TextDrawingOpts, queryOrExisting?: string | SVGTextElement): SVGTextElement {
   const p = createOrResolve<SVGTextElement>(
     parent,
     `text`,
-    queryOrExisting
+    queryOrExisting,
   );
   return textUpdate(p, pos, text, opts);
-};
+}
 
 /**
  * Creates a square grid based at a center point, with cells having `spacing` height and width.
@@ -340,18 +295,12 @@ export const text = (
  * @param height How high grid should be
  * @param opts
  */
-export const grid = (
-  parent: SVGElement,
-  center: Point,
-  spacing: number,
-  width: number,
-  height: number,
-  opts: LineDrawingOpts = {}
-): SVGGElement => {
+export function grid(parent: SVGElement, center: Point, spacing: number, width: number, height: number, opts: LineDrawingOpts = {}): SVGGElement {
   if (!opts.strokeStyle) {
     opts = { ...opts, strokeStyle: ColourStringFirst(`bg-dim`, `silver`) };
   }
-  if (!opts.strokeWidth) opts = { ...opts, strokeWidth: 1 };
+  if (!opts.strokeWidth)
+    opts = { ...opts, strokeWidth: 1 };
 
   const g = createEl<SVGGElement>(`g`);
   applyOpts(g, opts);
@@ -375,4 +324,4 @@ export const grid = (
   }
   parent.append(g);
   return g;
-};
+}

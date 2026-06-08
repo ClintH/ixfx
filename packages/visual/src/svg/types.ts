@@ -1,5 +1,5 @@
-export type MarkerOpts = StrokeOpts &
-  DrawingOpts & {
+export type MarkerOpts = StrokeOpts
+  & DrawingOpts & {
     readonly id: string;
     readonly markerWidth?: number;
     readonly markerHeight?: number;
@@ -10,8 +10,8 @@ export type MarkerOpts = StrokeOpts &
   };
 
 /**
-* Drawing options
-*/
+ * Drawing options for SVG elements
+ */
 export type DrawingOpts = {
   /**
    * Style for fill. Eg `black`.
@@ -67,20 +67,19 @@ export type MarkerDrawingOpts = {
   readonly markerMid?: MarkerOpts;
 };
 
-
 /**
  * Text drawing options
  */
-export type TextDrawingOpts = StrokeOpts &
-  DrawingOpts & {
+export type TextDrawingOpts = StrokeOpts
+  & DrawingOpts & {
     readonly anchor?: `start` | `middle` | `end`;
     readonly align?:
-    | `text-bottom`
-    | `text-top`
-    | `baseline`
-    | `top`
-    | `hanging`
-    | `middle`;
+      | `text-bottom`
+      | `text-top`
+      | `baseline`
+      | `top`
+      | `hanging`
+      | `middle`;
     readonly userSelect?: boolean;
   };
 

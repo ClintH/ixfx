@@ -1,12 +1,6 @@
 import type { Interval } from '@ixfx/core';
-
 import type { Result } from '@ixfx/guards';
-import type { TimeoutAsyncCallback, TimeoutSyncCallback } from './timeout.js';
 import { intervalToMs } from '@ixfx/core';
-import {
-  timeout,
-
-} from './timeout.js';
 
 /**
  * Returns a debounce function which acts to filter calls to a given function `fn`.
@@ -59,9 +53,6 @@ import {
  * d(10);
  * ```
  *
- * If the provided function is asynchronous, it's possible to await the debounced
- * version as well. If the invocation was filtered, it returns instantly.
- *
  * If you want the result of a debounced function when it finally executes, pass
  * in the `onResult` parameter:
  * ```js
@@ -73,6 +64,9 @@ import {
  * }
  * const d = debounce(fn, 1000, onResult);
  * ```
+ *
+ * Note that only the `onResult` handler for the function call that succeeeds is called,
+ * there's no queuing of callbacks.
  *
  * If the debounced function throws an error, this will be reported as well:
  * ```js
@@ -92,7 +86,7 @@ export function debounce<T extends AnyFn>(
 ): (...args: Parameters<T>) => void {
   let timer: ReturnType<typeof setTimeout> | undefined;
 
-  return (...args: Parameters<T>) => {
+  return (...args: Parameters<T>): void => {
     if (timer) {
       clearTimeout(timer);
     }
@@ -112,7 +106,7 @@ export function debounce<T extends AnyFn>(
   };
 }
 
-type AnyFn = (...args: any[]) => any;
+export type AnyFn = (...args: any[]) => any;
 // export function debounce(callback: TimeoutSyncCallback | TimeoutAsyncCallback, interval: Interval): DebouncedFunction {
 //   const t = timeout(callback, interval);
 //   return (...args: unknown[]) => {
