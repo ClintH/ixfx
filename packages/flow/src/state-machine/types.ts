@@ -1,8 +1,8 @@
 import type { LogOption } from "@ixfx/debug";
 
 export type DriverOptions<V extends Transitions> = {
-  readonly handlers: readonly DriverStatesHandler<V>[];
-  //readonly prereqs?: StatePrerequisites<V>;
+  readonly handlers: ReadonlyArray<DriverStatesHandler<V>>;
+  // readonly prereqs?: StatePrerequisites<V>;
   readonly debug?: LogOption;
   /**
    * If _true_ execution of handlers is shuffled each time
@@ -10,21 +10,18 @@ export type DriverOptions<V extends Transitions> = {
   readonly shuffleHandlers?: boolean;
 };
 
-export type DriverExpressionOrResult<T extends Transitions> =
-  | DriverResult<T>
-  | ((
-    machine?: MachineState<T>
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  ) => DriverResult<T> | undefined | void);
-
+export type DriverExpressionOrResult<T extends Transitions>
+  = | DriverResult<T>
+    | ((
+      machine?: MachineState<T>,
+    ) => DriverResult<T> | undefined | void);
 
 export type DriverStatesHandler<V extends Transitions> = {
   readonly if:
-  | readonly StateNames<V>[]
-  //eslint-disable-next-line functional/prefer-readonly-type
-  | StateNames<V>[]
-  | StateNames<V>;
-  readonly then: readonly DriverExpressionOrResult<V>[] | DriverExpressionOrResult<V>;
+    | ReadonlyArray<StateNames<V>>
+    | Array<StateNames<V>>
+    | StateNames<V>;
+  readonly then: ReadonlyArray<DriverExpressionOrResult<V>> | DriverExpressionOrResult<V>;
   /**
    * Logic for choosing which result, if there are multiple expressions.
    * By default 'highest' (for highest ranked result)
@@ -37,7 +34,7 @@ export type DriverRunner<V extends Transitions> = {
   readonly getValue: () => StateNames<V>;
   readonly reset: () => void;
   readonly to: (
-    state: StateNames<V>
+    state: StateNames<V>,
   ) => MachineState<V>;
 };
 
@@ -49,7 +46,7 @@ export type DriverResult<V extends Transitions> = {
    */
   readonly score?: number;
 
-  //readonly state?: StateMachine.StateNames<V>;
+  // readonly state?: StateMachine.StateNames<V>;
   /**
    * If specified,the state to transition to. Use
    * _true_ to attempt to automatically advance machine.
@@ -65,40 +62,40 @@ export type DriverResult<V extends Transitions> = {
 
 /**
  * Transition result
- * * 'Ok': transition valid
- * * 'FromNotFound': the from state is missing from machine definition
- * * 'ToNotFound': the 'to' state is missing from machine definition
- * * 'Invalid': not allowed to transition to target state from the current state
- * * 'Terminal':  not allowed to transition because from state is the final state
+ * 'Ok': transition valid
+ * 'FromNotFound': the from state is missing from machine definition
+ * 'ToNotFound': the 'to' state is missing from machine definition
+ * 'Invalid': not allowed to transition to target state from the current state
+ * 'Terminal':  not allowed to transition because from state is the final state
  */
-export type TransitionResult =
-  | `Ok`
-  | `FromNotFound`
-  | `ToNotFound`
-  | `Invalid`
-  | `Terminal`;
+export type TransitionResult
+  = | `Ok`
+    | `FromNotFound`
+    | `ToNotFound`
+    | `Invalid`
+    | `Terminal`;
 
 export type TransitionCondition<V extends Transitions> = {
-  readonly hasPriorState: readonly StateNames<V>[];
+  readonly hasPriorState: ReadonlyArray<StateNames<V>>;
   readonly isInState: StateNames<V>;
 };
 
 export type StateTargetStrict<V extends Transitions> = {
   readonly state: StateNames<V> | null;
-  readonly preconditions?: readonly TransitionCondition<V>[];
+  readonly preconditions?: ReadonlyArray<TransitionCondition<V>>;
 };
 
 /**
  * Possible state transitions, or _null_ if final state.
  */
-//export type StateTarget<V extends Transitions> = StateTargetExt<V> | null;
+// export type StateTarget<V extends Transitions> = StateTargetExt<V> | null;
 
-export type StateTarget<V extends Transitions> =
-  | string
-  | string[]
-  | readonly string[]
-  | null
-  | StateTargetStrict<V>;
+export type StateTarget<V extends Transitions>
+  = | string
+    | string[]
+    | readonly string[]
+    | null
+    | StateTargetStrict<V>;
 // | StateTargetStrict<V>[]
 // | readonly StateTargetStrict<V>[];
 
@@ -109,7 +106,7 @@ export type Transitions = {
   readonly [ key: string ]: StateTarget<Transitions>;
 };
 
-export type TransitionsStrict = Readonly<Record<string, readonly StateTargetStrict<Transitions>[]>>;
+export type TransitionsStrict = Readonly<Record<string, ReadonlyArray<StateTargetStrict<Transitions>>>>;
 /**
  * List of possible states
  */
@@ -137,18 +134,17 @@ export type MachineState<V extends Transitions> = {
    * List of unique states visited. Won't contain the current
    * state unless it has already been visited.
    */
-  readonly visited: readonly StateNames<V>[];
+  readonly visited: ReadonlyArray<StateNames<V>>;
   /**
    * Definition of state machine
    */
-  readonly machine: Readonly<Record<StateNames<V>, readonly StateTargetStrict<V>[]>>;
+  readonly machine: Readonly<Record<StateNames<V>, ReadonlyArray<StateTargetStrict<V>>>>;
 };
-
 
 export type StateEvent = (args: unknown, sender: any) => void;
 export type StateHandler = string | StateEvent | null;
 
-export type State = Readonly<Record<string, StateHandler>>
+export type State = Readonly<Record<string, StateHandler>>;
 
 // export interface MachineDescription {
 //   readonly [key: string]: string | readonly string[] | null;

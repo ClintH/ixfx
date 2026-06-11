@@ -16,11 +16,11 @@ import { messageHasValue, messageIsDoneSignal } from "./util.js";
  *
  * ```js
  * // Read from `source` for 5 seconds
- * const data = await toArray()(source);
+ * const data = await toArray(source);
  * // Read 5 items from `source`
- * const data = await toArray({ limit: 5 })(source);
+ * const data = await toArray(source, { limit: 5 });
  * // Read for 10s
- * const data = await toArray({ maximumWait: 10_1000 })(source);
+ * const data = await toArray(source, { maximumWait: 10_000 });
  * ```
  * @param source
  * @param options
@@ -33,6 +33,7 @@ export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<T
 
   const rx = resolveSource(source);
   let waitTimer: ReturnType<typeof setTimeout>;
+  let unsub = () => { /** no-op */ };
   const promise = new Promise<Array<V | undefined>>((resolve, reject) => {
     const done = () => {
       clearTimeout(waitTimer);
@@ -52,7 +53,7 @@ export async function toArray<V>(source: ReactiveOrSource<V>, options: Partial<T
       resolve(read);
     };
 
-    const unsub = rx.on((message) => {
+    unsub = rx.on((message) => {
       // console.log(`Rx.toArray: ${ JSON.stringify(message) }`);
       if (messageIsDoneSignal(message)) {
         done();
