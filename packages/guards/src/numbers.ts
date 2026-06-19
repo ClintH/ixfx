@@ -1,5 +1,5 @@
-import { resultsCollate } from "./result.js";
 import type { NumberGuardRange, Result } from "./types.js";
+import { resultsCollate } from "./result.js";
 
 /**
  * Returns true if `x` is a power of two
@@ -8,22 +8,21 @@ import type { NumberGuardRange, Result } from "./types.js";
  */
 export const isPowerOfTwo = (x: number): boolean => Math.log2(x) % 1 === 0;
 
-
 /**
  * Returns `fallback` if `v` is NaN, otherwise returns `v`.
- * 
+ *
  * Throws if `v` is not a number type, null or undefined
  * @param v
  * @param fallback
- * @returns
  */
-export const ifNaN = (v: unknown, fallback: number): number => {
+export function ifNaN(v: unknown, fallback: number): number {
   if (typeof v !== `number`) {
-    throw new TypeError(`v is not a number. Got: ${ typeof v }`);
+    throw new TypeError(`v is not a number. Got: ${typeof v}`);
   }
-  if (Number.isNaN(v)) return fallback;
+  if (Number.isNaN(v))
+    return fallback;
   return v;
-};
+}
 
 /**
  * Parses `value` as an integer, returning it if it meets the `range` criteria.
@@ -43,15 +42,12 @@ export const ifNaN = (v: unknown, fallback: number): number => {
  * @param value
  * @param range
  * @param defaultValue
- * @returns
  */
-export const integerParse = (
-  value: string | number | null,
-  range: NumberGuardRange = ``,
-  defaultValue: number = Number.NaN
-): number => {
-  if (typeof value === `undefined`) return defaultValue;
-  if (value === null) return defaultValue;
+export function integerParse(value: string | number | null, range: NumberGuardRange = ``, defaultValue: number = Number.NaN): number {
+  if (typeof value === `undefined`)
+    return defaultValue;
+  if (value === null)
+    return defaultValue;
   try {
     const parsed = Number.parseInt(typeof value === `number` ? value.toString() : value);
     const r = integerTest(parsed, range, `parsed`);
@@ -59,119 +55,117 @@ export const integerParse = (
   } catch {
     return defaultValue;
   }
-};
-
+}
 
 /**
  * Checks if `t` is not a number or within specified range.
  * Returns `[false, reason:string]` if invalid or `[true]` if valid.
- * 
+ *
  * Alternatives: {@link integerTest} for additional integer check, {@link percentTest} for percentage-range.
  *
- * * (empty, default): must be a number type and not NaN.
- * * finite: must be a number, not NaN and not infinite
- * * positive: must be at least zero
- * * negative: must be zero or lower
- * * aboveZero: must be above zero
- * * belowZero: must be below zero
- * * percentage: must be within 0-1, inclusive
- * * nonZero: can be anything except zero
- * * bipolar: can be -1 to 1, inclusive
+ * (empty, default): must be a number type and not NaN.
+ * finite: must be a number, not NaN and not infinite
+ * positive: must be at least zero
+ * negative: must be zero or lower
+ * aboveZero: must be above zero
+ * belowZero: must be below zero
+ * percentage: must be within 0-1, inclusive
+ * nonZero: can be anything except zero
+ * bipolar: can be -1 to 1, inclusive
  * @param value Value to check
- * @param parameterName Name of parameter (for more helpful exception messages)
  * @param range Range to enforce
- * @returns
+ * @param parameterName Name of parameter (for more helpful exception messages)
+ * @param info Additional info
  */
-export const numberTest = (
-  value?: unknown,
-  range: NumberGuardRange = ``,
-  parameterName = `?`,
-  info?: string
-): Result<number, string> => {
-  if (value === null) return { success: false, error: `Parameter '${ parameterName }' is null`, info };
+export function numberTest(value?: unknown, range: NumberGuardRange = ``, parameterName = `?`, info?: string): Result<number, string> {
+  if (value === null)
+    return { success: false, error: `Parameter '${parameterName}' is null`, info };
   if (typeof value === `undefined`) {
-    return { success: false, error: `Parameter '${ parameterName }' is undefined`, info };
+    return { success: false, error: `Parameter '${parameterName}' is undefined`, info };
   }
   if (Number.isNaN(value)) {
-    return { success: false, error: `Parameter '${ parameterName }' is NaN`, info };
+    return { success: false, error: `Parameter '${parameterName}' is NaN`, info };
   }
   if (typeof value !== `number`) {
-    return { success: false, error: `Parameter '${ parameterName }' is not a number (${ JSON.stringify(value) })`, info };
+    return { success: false, error: `Parameter '${parameterName}' is not a number (${JSON.stringify(value)})`, info };
   }
   switch (range) {
     case `finite`: {
       if (!Number.isFinite(value)) {
-        return { success: false, error: `Parameter '${ parameterName } must be finite (Got: ${ value })`, info };
+        return { success: false, error: `Parameter '${parameterName} must be finite (Got: ${value})`, info };
       }
       break;
     }
     case `positive`: {
       if (value < 0) {
-        return { success: false, error: `Parameter '${ parameterName }' must be at least zero (${ value })`, info };
+        return { success: false, error: `Parameter '${parameterName}' must be at least zero (${value})`, info };
       }
       break;
     } case `negative`: {
       if (value > 0) {
-        return { success: false, error: `Parameter '${ parameterName }' must be zero or lower (${ value })`, info };
+        return { success: false, error: `Parameter '${parameterName}' must be zero or lower (${value})`, info };
       }
       break;
     }
     case `aboveZero`: {
       if (value <= 0) {
         return {
-          success: false, error: `Parameter '${ parameterName }' must be above zero (${ value })`, info
+          success: false,
+          error: `Parameter '${parameterName}' must be above zero (${value})`,
+          info,
         };
-
       }
       break;
     }
     case `belowZero`: {
       if (value >= 0) {
-        return { success: false, error: `Parameter '${ parameterName }' must be below zero (${ value })`, info };
+        return { success: false, error: `Parameter '${parameterName}' must be below zero (${value})`, info };
       }
       break;
     }
     case `percentage`: {
       if (value > 1 || value < 0) {
         return {
-          success: false, error: `Parameter '${ parameterName }' must be in percentage range (0 to 1). (${ value })`, info
+          success: false,
+          error: `Parameter '${parameterName}' must be in percentage range (0 to 1). (${value})`,
+          info,
         };
       }
       break;
     }
     case `nonZero`: {
       if (value === 0) {
-        return { success: false, error: `Parameter '${ parameterName }' must non-zero. (${ value })`, info };
+        return { success: false, error: `Parameter '${parameterName}' must non-zero. (${value})`, info };
       }
       break;
     }
     case `bipolar`: {
       if (value > 1 || value < -1) {
-        return { success: false, error: `Parameter '${ parameterName }' must be in bipolar percentage range (-1 to 1). (${ value })`, info };
+        return { success: false, error: `Parameter '${parameterName}' must be in bipolar percentage range (-1 to 1). (${value})`, info };
       }
       break;
     }
   }
   return { success: true, value, info };
-};
+}
 
 /**
  * Checks if `t` is not a number or within specified range.
  * Throws if invalid. Use {@link numberTest} to test without throwing.
  *
-* * (empty, default): must be a number type and not NaN.
-* * positive: must be at least zero
-* * negative: must be zero or lower
-* * aboveZero: must be above zero
-* * belowZero: must be below zero
-* * percentage: must be within 0-1, inclusive
-* * nonZero: can be anything except zero
-* * bipolar: can be -1 to 1, inclusive
-* 
+ * (empty, default): must be a number type and not NaN.
+ * positive: must be at least zero
+ * negative: must be zero or lower
+ * aboveZero: must be above zero
+ * belowZero: must be below zero
+ * percentage: must be within 0-1, inclusive
+ * nonZero: can be anything except zero
+ * bipolar: can be -1 to 1, inclusive
+ *
  * Alternatives: {@link integerTest} for additional integer check, {@link percentTest} for percentage-range.
  * @param value Value to test
  * @param range Range
- * @param parameterName Name of parameter 
+ * @param parameterName Name of parameter
  */
 // export const throwNumberTest = (value?: unknown,
 //   range: NumberGuardRange = ``,
@@ -187,24 +181,26 @@ export const numberTest = (
  * a: 10.123 b: 10.14   decimals: 1 = true
  * a: 10.123 b: 10.14   decimals: 2 = false
  * ``
- * @param a 
- * @param b 
+ * @param a
+ * @param b
  * @param decimals How many decimals to include
- * @returns 
+ * @returns
  */
-export const numberDecimalTest = (a: number, b: number, decimals = 3): Result<number, string> => {
+export function numberDecimalTest(a: number, b: number, decimals = 3): Result<number, string> {
   if (decimals === 0) {
     a = Math.floor(a);
     b = Math.floor(b);
-    if (a === b) return { success: true, value: a };
+    if (a === b)
+      return { success: true, value: a };
     return { success: false, error: `A is not identical to B` };
   }
 
-  const mult = Math.pow(10, decimals);
+  const mult = 10 ** decimals;
   const aa = Math.floor(a * mult);
   const bb = Math.floor(b * mult);
-  if (aa !== bb) return { success: false, error: `A is not close enough to B. A: ${ a } B: ${ b } Decimals: ${ decimals }` };
-  return { success: true, value: a }
+  if (aa !== bb)
+    return { success: false, error: `A is not close enough to B. A: ${a} B: ${b} Decimals: ${decimals}` };
+  return { success: true, value: a };
 }
 
 /**
@@ -214,60 +210,59 @@ export const numberDecimalTest = (a: number, b: number, decimals = 3): Result<nu
  * This is the same as calling ```number(t, `percentage`)```
  * @param value Value to check
  * @param parameterName Param name for customising exception message
- * @returns
+ * @param info Additional info for exception message
  */
-export const percentTest = (value: number, parameterName = `?`, info?: string): Result<number, string> =>
-  numberTest(value, `percentage`, parameterName, info);
+export function percentTest(value: number, parameterName = `?`, info?: string): Result<number, string> {
+  return numberTest(value, `percentage`, parameterName, info);
+}
 
 // export const throwPercentTest = (value: number, parameterName = `?`) => {
 //   throwFromResult(percentTest(value, parameterName));
-//}
+// }
 /**
  * Checks if `value` an integer and meets additional criteria.
  * See {@link numberTest} for guard details, or use that if integer checking is not required.
  *
  * Note:
- * * `bipolar` will mean -1, 0 or 1.
- * * positive: must be at least zero
- * * negative: must be zero or lower
- * * aboveZero: must be above zero
- * * belowZero: must be below zero
- * * percentage: must be within 0-1, inclusive
- * * nonZero: can be anything except zero
+ * `bipolar` will mean -1, 0 or 1.
+ * positive: must be at least zero
+ * negative: must be zero or lower
+ * aboveZero: must be above zero
+ * belowZero: must be below zero
+ * percentage: must be within 0-1, inclusive
+ * nonZero: can be anything except zero
  * @param value Value to check
- * @param parameterName Param name for customising exception message
  * @param range Guard specifier.
+ * @param parameterName Param name for customising exception message
  */
-export const integerTest = (
-  value: unknown,
-  range: NumberGuardRange = ``,
-  parameterName = `?`
-): Result<number, string> => {
+export function integerTest(value: unknown, range: NumberGuardRange = ``, parameterName = `?`): Result<number, string> {
   return resultsCollate(
     numberTest(value, range, parameterName),
     () => {
       if (!Number.isInteger(value)) {
-        return { success: false, error: `Param '${ parameterName }' is not an integer` };
+        return { success: false, error: `Param '${parameterName}' is not an integer` };
       }
-      return { success: true, value: value }
-    }
-  )
-};
+      return { success: true, value };
+    },
+  );
+}
 
-export const integerArrayTest = (numbers: Iterable<number>): Result<Iterable<number>, string> => {
+export function integerArrayTest(numbers: Iterable<number>): Result<Iterable<number>, string> {
   for (const v of numbers) {
-    if (Math.abs(v) % 1 !== 0) return { success: false, error: `Value is not an integer: ${ v }` };
+    if (Math.abs(v) % 1 !== 0)
+      return { success: false, error: `Value is not an integer: ${v}` };
   }
   return { success: true, value: numbers };
-};
+}
 
 /**
  * Returns _true_ if `value` is an integer in number or string form
- * @param value 
- * @returns 
+ * @param value
+ *
  */
-export const isInteger = (value: number | string): boolean => {
-  if (typeof value === `string`) value = Number.parseFloat(value);
+export function isInteger(value: number | string): boolean {
+  if (typeof value === `string`)
+    value = Number.parseFloat(value);
   const r = integerTest(value);
   return r.success;
 }
@@ -278,22 +273,22 @@ export const isInteger = (value: number | string): boolean => {
 //   throwFromResult(integerTest(value, range, parameterName));
 // }
 
-export const numberInclusiveRangeTest = (value: number | undefined, min: number, max: number, parameterName = `?`): Result<number, string> => {
+export function numberInclusiveRangeTest(value: number | undefined, min: number, max: number, parameterName = `?`): Result<number, string> {
   if (typeof value !== `number`) {
-    return { success: false, error: `Param '${ parameterName }' is not a number type. Got type: '${ typeof value }' value: '${ JSON.stringify(value) }'` };
+    return { success: false, error: `Param '${parameterName}' is not a number type. Got type: '${typeof value}' value: '${JSON.stringify(value)}'` };
   }
   if (Number.isNaN(value)) {
-    return { success: false, error: `Param '${ parameterName }' is not within range ${ min }-${ max }. Got: NaN` };
+    return { success: false, error: `Param '${parameterName}' is not within range ${min}-${max}. Got: NaN` };
   }
   if (Number.isFinite(value)) {
     if (value < min) {
-      return { success: false, error: `Param '${ parameterName }' is below range ${ min }-${ max }. Got: ${ value }` };
+      return { success: false, error: `Param '${parameterName}' is below range ${min}-${max}. Got: ${value}` };
     } else if (value > max) {
-      return { success: false, error: `Param '${ parameterName }' is above range ${ min }-${ max }. Got: ${ value }` };
+      return { success: false, error: `Param '${parameterName}' is above range ${min}-${max}. Got: ${value}` };
     }
     return { success: true, value };
   } else {
-    return { success: false, error: `Param '${ parameterName }' is not within range ${ min }-${ max }. Got: infinite` };
+    return { success: false, error: `Param '${parameterName}' is not within range ${min}-${max}. Got: infinite` };
   }
 }
 
@@ -305,22 +300,22 @@ export const numberInclusiveRangeTest = (value: number | undefined, min: number,
 
 /**
  * Returns a success if values are equal, considering the set digits of precision (1..21)
- * 
+ *
  * @param expected Expected value
  * @param got Received value
  * @param precision Precision in terms of decimal digits. 1...21, default 21
- * @param parameterName 
- * @returns 
+ * @param parameterName Name of parameter (for more helpful exception messages)
  */
-export const equalWithPrecisionTest = (expected: number, got: number, precision = 21, parameterName = `?`): Result<number, string> => {
+export function equalWithPrecisionTest(expected: number, got: number, precision = 21, parameterName = `?`): Result<number, string> {
   const expectedString = expected.toPrecision(precision);
   const gotString = got.toPrecision(precision);
   const v = expectedString === gotString;
   if (v) {
-    return { success: true, value: got }
+    return { success: true, value: got };
   } else {
     return {
-      success: false, error: `Param '${ parameterName }' is '${ got }', expected '${ expected }' (using precision: ${ precision })`
-    }
+      success: false,
+      error: `Param '${parameterName}' is '${got}', expected '${expected}' (using precision: ${precision})`,
+    };
   }
 }
