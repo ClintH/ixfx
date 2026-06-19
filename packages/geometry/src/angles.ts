@@ -1,5 +1,6 @@
 import type { PointAverageKinds } from './point/averager.js';
 import type { Point } from './point/point-type.js';
+import { booleanTest, numberTest, resultThrow, stringTest } from '@ixfx/guards';
 import { piPi } from './pi.js';
 import { average as pointAverage } from './point/averager.js';
 
@@ -144,8 +145,14 @@ export function radiansSum(start: number, amount: number, clockwise = true): num
  * @param clockwise Add in clockwise direction (default: _true_)
  * @returns Sum result, in degrees
  */
-export const degreesSum = (start: number, amount: number, clockwise = true): number => radianToDegree(radiansSum(degreeToRadian(start), degreeToRadian(amount), clockwise));
-
+export function degreesSum(start: number, amount: number, clockwise = true): number {
+  resultThrow(
+    numberTest(start, ``, `start`),
+    numberTest(amount, ``, `amount`),
+    booleanTest(clockwise, `clockwise`),
+  );
+  return radianToDegree(radiansSum(degreeToRadian(start), degreeToRadian(amount), clockwise));
+}
 /**
  * Computes the angle arc between a start and end angle,
  * given in radians. It properly accounts for the wrap-around
@@ -182,6 +189,11 @@ export function radianArc(
   end: number,
   direction: AngleDirection = `short`,
 ): number {
+  resultThrow(
+    numberTest(start, ``, `start`),
+    numberTest(end, ``, `end`),
+    stringTest(direction, ``, `direction`),
+  );
   // Proper modulo for negatives
   const mod = (n: number, m: number) => ((n % m) + m) % m;
 
@@ -214,6 +226,9 @@ export function radianArc(
       }
 
       return Math.abs(ccw) >= Math.abs(cw) ? ccw : cw;
+    }
+    default: {
+      throw new TypeError(`Invalid direction: ${direction}. Expected: 'short', 'long', 'cw' or 'ccw'`);
     }
   }
 }
@@ -260,6 +275,11 @@ export function radianArc(
  * @returns Angle of arc, in degrees.
  */
 export function degreeArc(start: number, end: number, direction: AngleDirection = `short`): number {
+  resultThrow(
+    numberTest(start, ``, `start`),
+    numberTest(end, ``, `end`),
+    stringTest(direction, ``, `direction`),
+  );
   return radianToDegree(radianArc(degreeToRadian(start), degreeToRadian(end), direction));
 }
 
@@ -397,7 +417,6 @@ export function isAngleType(v: any): v is Angle {
 /**
  * Returns _true_ if `v` is a number, string or `Angle` type.
  * @param v
- * @returns
  */
 export function isAngleTypeConvertible(v: any): v is AngleConvertible {
   if (typeof v === `undefined`)
