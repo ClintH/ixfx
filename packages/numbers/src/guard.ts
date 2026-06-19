@@ -1,10 +1,12 @@
 /**
  * Returns true if `possibleNumber` is a number and not NaN
  * @param possibleNumber
- * @returns
+ * @returns _True_ if is a number and not NaN
  */
-export const isValid = (possibleNumber: unknown): boolean => {
-  if (typeof possibleNumber !== `number`) return false;
-  if (Number.isNaN(possibleNumber)) return false;
+export function isValid(possibleNumber: unknown): boolean {
+  if (typeof possibleNumber !== `number`)
+    return false;
+  if (Number.isNaN(possibleNumber))
+    return false;
   return true;
-};
+}
