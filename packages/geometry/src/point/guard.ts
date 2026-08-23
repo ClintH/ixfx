@@ -28,37 +28,37 @@ export function isNaN(p: Point): boolean {
 
 export function pointTest(p: Point, name = `Point`, extraInfo = ``): Result<Point, string> {
   if (p === undefined) {
-    return errorResult(`'${name}' is undefined. Expected {x,y} got ${JSON.stringify(p)}`, extraInfo);
+    return errorResult(`Param '${name}' is undefined. Expected {x,y}}`, extraInfo);
   }
   if (p === null) {
     return errorResult(
-      `'${name}' is null. Expected {x,y} got ${JSON.stringify(p)}`,
+      `Param '${name}' is null. Expected {x,y}`,
       extraInfo,
     );
   }
   if (typeof p !== `object`) {
     return errorResult(
-      `'${name}' is type '${typeof p}'. Expected object.`,
+      `Param '${name}' is type '${typeof p}'. Expected object.`,
       extraInfo,
     );
   }
   if (p.x === undefined) {
     return errorResult(
-      `'${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`,
+      `Param '${name}.x' is undefined. Expected {x,y} got ${JSON.stringify(p)}`,
       extraInfo,
     );
   }
   if (p.y === undefined) {
     return errorResult(
-      `'${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`,
+      `Param '${name}.y' is undefined. Expected {x,y} got ${JSON.stringify(p)}`,
       extraInfo,
     );
   }
   if (typeof p.x !== `number`) {
-    return errorResult(`'${name}.x' must be a number. Got ${typeof p.x}`, extraInfo);
+    return errorResult(`Param '${name}.x' must be a number. Got ${typeof p.x}`, extraInfo);
   }
   if (typeof p.y !== `number`) {
-    return errorResult(`'${name}.y' must be a number. Got ${typeof p.y}`, extraInfo);
+    return errorResult(`Param '${name}.y' must be a number. Got ${typeof p.y}`, extraInfo);
   }
   if (p.z !== undefined) {
     if (typeof p.z !== `number`)
