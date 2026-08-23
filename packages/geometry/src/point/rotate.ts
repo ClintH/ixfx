@@ -1,8 +1,10 @@
-import { numberTest, resultThrow } from "@ixfx/guards";
+import type { Angle } from '../angles.js';
 import type { Point } from "./point-type.js";
+import { numberTest, resultThrow } from "@ixfx/guards";
+import { toRadian as AngleToRadian } from '../angles.js';
+import { fromCartesian as PolarFromCartesian, rotate as PolarRotate, toCartesian as PolarToCartesian } from "../polar/index.js";
+
 import { guard } from "./guard.js";
-import { fromCartesian as PolarFromCartesian } from "../polar/index.js";
-import { rotate as PolarRotate, toCartesian as PolarToCartesian } from "../polar/index.js";
 /**
  * Rotate a single point by a given amount in radians
  * @param pt
@@ -20,31 +22,44 @@ export function rotate(pt: Point, amountRadian: number, origin?: Point): Point;
 export function rotate(
   pt: readonly Point[],
   amountRadian: number,
-  origin?: Point
+  origin?: Point,
 ): readonly Point[];
 
 export function rotate(
   pt: Point | readonly Point[],
   amountRadian: number,
-  origin?: Point
+  origin?: Point,
 ): Point | readonly Point[] {
-  if (typeof origin === `undefined`) origin = { x: 0, y: 0 };
+  if (typeof origin === `undefined`)
+    origin = { x: 0, y: 0 };
   guard(origin, `origin`);
   resultThrow(numberTest(amountRadian, ``, `amountRadian`));
   const arrayInput = Array.isArray(pt);
 
   // no-op
-  if (amountRadian === 0) return pt;
+  if (amountRadian === 0)
+    return pt;
 
   if (!arrayInput) {
-    pt = [ pt as Point ];
+    pt = [pt as Point];
   }
 
   const ptAr = pt as readonly Point[];
-  for (const [ index, p ] of ptAr.entries()) guard(p, `pt[${ index }]`);
+  for (const [index, p] of ptAr.entries()) guard(p, `pt[${index}]`);
 
-  const asPolar = ptAr.map((p) => PolarFromCartesian(p, origin));
-  const rotated = asPolar.map((p) => PolarRotate(p, amountRadian));
-  const asCartesisan = rotated.map((p) => PolarToCartesian(p, origin));
-  return arrayInput ? asCartesisan : asCartesisan[ 0 ];
+  const asPolar = ptAr.map(p => PolarFromCartesian(p, origin));
+  const rotated = asPolar.map(p => PolarRotate(p, amountRadian));
+  const asCartesisan = rotated.map(p => PolarToCartesian(p, origin));
+  return arrayInput ? asCartesisan : asCartesisan[0];
+}
+
+export function rotateByAngle(pt: Point, angle: Angle | number): Point {
+  const r = AngleToRadian(angle);
+  const cos = Math.cos(r);
+  const sin = Math.sin(r);
+  return {
+    ...pt,
+    x: pt.x * cos - pt.y * sin,
+    y: pt.x * sin + pt.y * cos,
+  };
 }
