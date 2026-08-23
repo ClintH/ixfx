@@ -1,8 +1,8 @@
 import type { Grid, GridArray1d, GridBoundsLogic, GridCell, GridCellAccessor, GridCellSetter, UniformGrid } from "./types.js";
 import { resultThrow } from "@ixfx/guards";
 import { cells } from "./enumerators/cells.js";
-import { cellKeyString, gridString, indexFromCell, testGrid } from "./index.js";
-
+import { testGrid } from './guards.js';
+import { cellKeyString, gridString, indexFromCell } from "./index.js";
 /**
  * Returns a {@link GridCellAccessor} to get values from `array`
  * based on cell (`{x,y}`) coordinates.
@@ -29,7 +29,7 @@ export function access<V>(array: readonly V[], grid: Grid): GridCellAccessor<V> 
   return fn;
 }
 
-function accessWithGrid<T>(grid: Grid, array: readonly T[] | T[], cell: GridCell, wrap: GridBoundsLogic) {
+export function accessWithGrid<T>(grid: Grid, array: readonly T[] | T[], cell: GridCell, wrap: GridBoundsLogic): T | undefined {
   const index = indexFromCell(grid, cell, wrap);
   if (index === undefined)
     return undefined;
