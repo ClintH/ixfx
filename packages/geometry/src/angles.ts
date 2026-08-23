@@ -284,7 +284,7 @@ export function degreeArc(start: number, end: number, direction: AngleDirection 
 }
 
 /**
- * A angle with unit.
+ * An angle with unit.
  * - [Degrees](https://en.wikipedia.org/wiki/Degree_(angle)): 0..360
  * - [Radians](https://en.wikipedia.org/wiki/Radian): 0...2Pi
  * - [Gradians](https://en.wikipedia.org/wiki/Gradian): 0..400
