@@ -1,6 +1,7 @@
 import type { Line } from './line/line-type.js';
 import type { Point } from './point/point-type.js';
 import { resultThrow } from '@ixfx/guards';
+import * as Angles from './angles.js';
 import { lineTest } from './line/guard.js';
 import { distance as PointsDistance } from './point/distance.js';
 import { divide as PointDivide } from './point/divider.js';
@@ -27,11 +28,33 @@ const pi = Math.PI;
 // const Q3 = Q1 + Q2;
 // const Q4 = Math.PI * 2;
 
+/**
+ * Returns a Cartesian-coordinate vector from an angle in radians.
+ * To create a vector from an angle in arbitrary units, use {@link fromAngle}.
+ * ```js
+ * fromRadians(Math.PI); // { x: -1, y: 0 }
+ * ```
+ * @param radians
+ * @returns Point in Cartesian coordinates
+ */
 export function fromRadians(radians: number): Point {
   return Object.freeze({
     x: Math.cos(radians),
     y: Math.sin(radians),
   });
+}
+
+/**
+ * Returns a vector from an angle. If a number is given, it's assumed to be degrees
+ * ```js
+ * fromAngle(90); // { x: 0, y: 1 }
+ * fromAngle({ value: 90, unit: `deg` }); // { x: 0, y: 1 }
+ * ```
+ * @param angle
+ * @returns Vector in Cartesian coordinates
+ */
+export function fromAngle(angle: Angles.Angle | number): Point {
+  return fromRadians(Angles.toRadian(angle));
 }
 
 export function toRadians(point: Point): number {
@@ -45,7 +68,7 @@ export function toRadians(point: Point): number {
  * @param pt Point
  * @param angleNormalisation Technique to normalise angle
  * @param origin Origin to calculate vector from or 0,0 if left empty
- * @returns
+ * @returns Polar coordinate
  */
 export function fromPointPolar(pt: Point, angleNormalisation: `` | `unipolar` | `bipolar` = ``, origin: Point = EmptyCartesian): Polar.Coord {
   pt = PointsSubtract(pt, origin);
@@ -69,7 +92,7 @@ export function fromPointPolar(pt: Point, angleNormalisation: `` | `unipolar` | 
 /**
  * Returns a Cartesian-coordinate vector from a line a -> b
  * @param line
- * @returns
+ * @returns Point in Cartesian coordinates
  */
 export function fromLineCartesian(line: Line): Point {
   return PointsSubtract(line.b, line.a);
@@ -78,7 +101,7 @@ export function fromLineCartesian(line: Line): Point {
 /**
  * Returns a polar-coordinate vector from a line a -> b
  * @param line
- * @returns
+ * @returns Polar coordinate
  */
 export function fromLinePolar(line: Line): Polar.Coord {
   resultThrow(lineTest(line, `line`));
@@ -104,7 +127,7 @@ function isCartesian(v: Vector): v is Point {
  * direction is kept, but magnitude set to 1. This then just
  * suggests direction.
  * @param v
- * @returns
+ * @returns Vector with magnitude of 1
  */
 export function normalise(v: Vector): Vector {
   if (isPolar(v)) {
@@ -163,7 +186,7 @@ export function toCartesian(v: Vector): Point {
  * Return a human-friendly representation of vector
  * @param v
  * @param digits
- * @returns
+ * @returns string
  */
 export function toString(v: Vector, digits?: number): string {
   if (isPolar(v)) {
@@ -179,7 +202,7 @@ export function toString(v: Vector, digits?: number): string {
  * Calculate dot product of a vector
  * @param a
  * @param b
- * @returns
+ * @returns Dot product of two vectors
  */
 export function dotProduct(a: Vector, b: Vector): number {
   if (isPolar(a) && isPolar(b)) {
@@ -195,7 +218,7 @@ export function dotProduct(a: Vector, b: Vector): number {
  * @param v Vector to clamp
  * @param max Maximum magnitude
  * @param min Minium magnitude
- * @returns
+ * @returns Point
  */
 export function clampMagnitude(v: Vector, max = 1, min = 0): Point | Readonly<{
   distance: number;
@@ -215,7 +238,7 @@ export function clampMagnitude(v: Vector, max = 1, min = 0): Point | Readonly<{
  * Vector is returned in the same type as `a`.
  * @param a
  * @param b
- * @returns
+ * @returns Vector in the same type as `a`
  */
 export function sum(a: Vector, b: Vector): Point | Readonly<{
   distance: number;
