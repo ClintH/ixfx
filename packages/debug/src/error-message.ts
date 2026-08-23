@@ -1,12 +1,13 @@
 /**
  * Returns a string representation of an error
- * @param ex 
- * @returns 
+ * @param error
+ * @returns strign
  */
-export const getErrorMessage = (ex: unknown): string => {
-  if (typeof ex === `string`) return ex;
-  if (ex instanceof Error) {
-    return ex.message;
+export function getErrorMessage(error: unknown): string {
+  if (typeof error === `string`)
+    return error;
+  if (error instanceof Error) {
+    return error.message;
   }
-  return ex as string;
-};
+  return error as string;
+}

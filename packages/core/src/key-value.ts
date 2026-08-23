@@ -1,6 +1,5 @@
-
-import type { KeyValue } from './types.js'
-//import { minMaxAvg as arrayMinMaxAvg } from '../../ixfx/src/numbers-compute.js';
+import type { KeyValue } from './types.js';
+// import { minMaxAvg as arrayMinMaxAvg } from '../../ixfx/src/numbers-compute.js';
 
 import { defaultComparer } from './comparers.js';
 
@@ -25,18 +24,19 @@ import { defaultComparer } from './comparers.js';
 
 export type KeyValueSorter = (data: KeyValue[]) => KeyValue[];
 
-const sorterByValueIndex = (index: number, reverse = false) => {
+function sorterByValueIndex(index: number, reverse = false) {
   return (values: KeyValue[]) => {
     const s = values.toSorted((a, b) => {
-      return defaultComparer(a[ index ], b[ index ]);
+      return defaultComparer(a[index], b[index]);
     });
-    if (reverse) return s.reverse();
+    if (reverse)
+      return s.reverse();
     return s;
-  }
+  };
 }
 
 export type KeyValueSortSyles = `value` | `value-reverse` | `key` | `key-reverse`;
-export const keyValueSorter = (sortStyle: KeyValueSortSyles): KeyValueSorter => {
+export function keyValueSorter(sortStyle: KeyValueSortSyles): KeyValueSorter {
   switch (sortStyle) {
     case `value`: {
       return sorterByValueIndex(1, false);
@@ -51,11 +51,10 @@ export const keyValueSorter = (sortStyle: KeyValueSortSyles): KeyValueSorter => 
       return sorterByValueIndex(0, true);
     }
     default: {
-      throw new Error(`Unknown sorting value '${ (sortStyle as string) }'. Expecting: value, value-reverse, key or key-reverse`);
+      throw new Error(`Unknown sorting value '${(sortStyle as string)}'. Expecting: value, value-reverse, key or key-reverse`);
     }
   }
-};
-
+}
 
 // export const minMaxAvg = (entries: readonly KeyValue[], conversionFunction?: (v: KeyValue) => number) => {
 //   const converter = conversionFunction ?? ((v: KeyValue) => v[ 1 ] as number);
