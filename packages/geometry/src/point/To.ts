@@ -1,5 +1,5 @@
-import { guard } from "./guard.js";
 import type { Point, Point3d } from "./point-type.js";
+import { guard } from "./guard.js";
 
 /**
  * Returns a point with rounded x,y coordinates. By default uses `Math.round` to round.
@@ -14,27 +14,24 @@ import type { Point, Point3d } from "./point-type.js";
  * @param rounder Rounding function, or Math.round by default
  * @returns
  */
-export const toIntegerValues = (
-  pt: Point,
-  rounder: (x: number) => number = Math.round
-): Point => {
+export function toIntegerValues(pt: Point, rounder: (x: number) => number = Math.round): Point {
   guard(pt, `pt`);
   return Object.freeze({
     x: rounder(pt.x),
     y: rounder(pt.y),
   });
-};
+}
 
 /**
  * Returns a copy of `pt` with `z` field omitted.
  * If it didn't have one to begin within, a copy is still returned.
- * @param pt 
- * @returns 
+ * @param pt
+ * @returns
  */
-export const to2d = (pt: Point): Point => {
+export function to2d(pt: Point): Point {
   guard(pt, `pt`);
-  let copy = {
-    ...pt
+  const copy = {
+    ...pt,
   };
   delete copy.z;
   return Object.freeze(copy);
@@ -45,13 +42,13 @@ export const to2d = (pt: Point): Point => {
  * Defaults to a z value of 0.
  * @param pt Point
  * @param z Z-value, defaults to 0
- * @returns 
+ * @returns
  */
-export const to3d = (pt: Point, z: number = 0): Point3d => {
+export function to3d(pt: Point, z: number = 0): Point3d {
   guard(pt, `pt`);
   return Object.freeze({
     ...pt,
-    z
+    z,
   });
 }
 
@@ -62,17 +59,19 @@ export const to3d = (pt: Point, z: number = 0): Point3d => {
  * @returns
  */
 export function toString(p: Point, digits?: number): string {
-  if (p === undefined) return `(undefined)`;
-  if (p === null) return `(null)`;
+  if (p === undefined)
+    return `(undefined)`;
+  if (p === null)
+    return `(null)`;
   guard(p, `pt`);
 
   const x = digits ? p.x.toFixed(digits) : p.x;
   const y = digits ? p.y.toFixed(digits) : p.y;
 
   if (p.z === undefined) {
-    return `(${ x },${ y })`;
+    return `(${x},${y})`;
   } else {
     const z = digits ? p.z.toFixed(digits) : p.z;
-    return `(${ x },${ y },${ z })`;
+    return `(${x},${y},${z})`;
   }
 }
