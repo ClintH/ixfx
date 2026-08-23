@@ -126,10 +126,13 @@ export * as SurfacePoints from './surface-points.js';
 export * as Triangles from './triangle/index.js';
 
 export type * from './triangle/triangle-type.js';
+
 /**
  * Helper functions for working with vectors, which can either be a {@link Points.Point} or Polar {@link Polar.Coord}.
  * While most of the functionality is provided in either of those modules, the Vector module lets you cleanly
  * interoperate between these two coordinates.
+ *
+ * @module
  */
 export * as Vectors from './vector.js';
 
