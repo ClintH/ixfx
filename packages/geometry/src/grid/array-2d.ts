@@ -1,5 +1,8 @@
 import type { Grid, GridBoundsLogic, GridCell, GridCellAccessor, GridCellSetter, GridReadable, GridWritable, UniformGrid } from "./types.js";
+import { resultThrow } from "@ixfx/guards";
 import { applyBounds } from "./apply-bounds.js";
+import { cells } from "./enumerators/cells.js";
+import { testGrid } from './guards.js';
 import { gridString } from "./to-string.js";
 
 export type ArrayGrid<T> = GridReadable<T> & GridWritable<T> & {
@@ -150,4 +153,27 @@ export function wrap<T>(array: T[][]): ArrayGrid<T> {
       return array;
     },
   };
+}
+/**
+ * Creates a 2-dimensional array to fit a grid of rows x cols.
+ * The outer array is the rows, the inner arrays are the columns.
+ *
+ * ```js
+ * const arr = createArray(0, { rows: 10, cols: 20 });
+ * arr[4][9]; // Get value at row 5, col 10
+ * ```
+ * @param initialValue Initial value to fill array
+ * @param grid Grid shape to make
+ */
+export function createArray<T>(initialValue: T, grid: UniformGrid): T[][] {
+  resultThrow(
+    testGrid(grid),
+  );
+  const t: T[][] = [];
+  for (const c of cells(grid)) {
+    const row = Array.from<T>({ length: grid.cols }).fill(initialValue);
+    t[c.y] = row;
+  }
+
+  return t;
 }
