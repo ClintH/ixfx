@@ -46,7 +46,7 @@ export function isRgb(v: any): v is Rgb {
  * If RGB values are less than 1 assumes unit:scalar. Otherwise unit:8bit.
  * If RGB values exceed 255, _undefined_ returned.
  * @param v
- * @returns
+ * @returns Rgb object or _undefined_ if the input object is not a valid Rgb type.
  */
 export function tryParseObjectToRgb(v: any): Rgb | undefined {
   if (typeof v !== `object`)
@@ -68,6 +68,30 @@ export function tryParseObjectToRgb(v: any): Rgb | undefined {
   return v as Rgb;
 }
 
+export function tryParseObjectToOkLch(v: any): OkLch | undefined {
+  if (typeof v !== `object`)
+    throw new TypeError(`Param 'v' is expected to be an object, got: ${typeof v}`);
+  if (!(`l` in v && `c` in v && `h` in v))
+    return;
+  if (!(`unit` in v))
+    v.unit = `scalar`;
+  if (!(`space` in v))
+    v.space = `oklch`;
+  return v as OkLch;
+}
+
+/**
+ * If the input object has h, s and l properties, it will return a fully-
+ * formed Hsl type with `unit` and `space` properties.
+ *
+ * If it lacks these basic three properties or they are out of range,
+ *  _undefined_ is returned.
+ *
+ * If HSL values are less than 1 assumes unit:scalar. Otherwise unit:8bit.
+ * If HSL values exceed 100, _undefined_ returned.
+ * @param v
+ * @returns Hsl object or _undefined_ if the input object is not a valid Hsl type.
+ */
 export function tryParseObjectToHsl(v: any): Hsl | undefined {
   if (!(`h` in v && `s` in v && `l` in v))
     return;

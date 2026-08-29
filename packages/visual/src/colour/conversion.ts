@@ -1,7 +1,7 @@
 import type { Colour, Colourish, ColourSpaces, ConvertDestinations, Hsl, HslAbsolute, HslScalar, OkLch, OkLchAbsolute, OkLchScalar, Rgb, Rgb8Bit, RgbScalar } from "./types.js";
 import Colorizr from "colorizr";
 import { fromCssColour } from "./css-colours.js";
-import { isColourish, isHsl, isOkLch, isRgb, tryParseObjectToHsl, tryParseObjectToRgb } from "./guards.js";
+import { isColourish, isHsl, isOkLch, isRgb, tryParseObjectToHsl, tryParseObjectToOkLch, tryParseObjectToRgb } from "./guards.js";
 import * as HslSpace from './hsl.js';
 import { OklchSpace } from "./index.js";
 import * as OkLchSpace from './oklch.js';
@@ -103,6 +103,7 @@ export function toCssColour(colour: Colourish | object): string {
   if (isOkLch(colour)) {
     return OklchSpace.toCssString(colour);
   }
+
   const asRgb = tryParseObjectToRgb(colour);
   if (asRgb)
     return SrgbSpace.toCssString(asRgb);
@@ -110,6 +111,10 @@ export function toCssColour(colour: Colourish | object): string {
   const asHsl = tryParseObjectToHsl(colour);
   if (asHsl)
     return HslSpace.toCssString(asHsl);
+
+  const asOkLch = tryParseObjectToOkLch(colour);
+  if (asOkLch)
+    return OklchSpace.toCssString(asOkLch);
 
   throw new Error(`Unknown colour format: '${JSON.stringify(colour)}'`);
 }
