@@ -292,7 +292,7 @@ export function to<V extends Transitions>(sm: MachineState<V>, toState: StateNam
   return Object.freeze({
     value: toState,
     machine: sm.machine,
-    visited: [...new Set(...(sm.visited as string[]), sm.value as string)],
+    visited: [...new Set([...(sm.visited as string[]), sm.value as string])],
   });
 }
 
