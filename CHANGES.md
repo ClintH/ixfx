@@ -1,5 +1,10 @@
 A rough changelog between NPM releases
 
+# 2026.08.23
+
+@ixfx/Random
++ Noise sub-module with Simplex noise implementation
+  
 # 2026.05.30
 
 @ixfx/modulation
