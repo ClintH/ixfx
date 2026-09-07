@@ -1,8 +1,8 @@
 import type { Angle, AngleConvertible, AngleRad } from "@ixfx/geometry/angles";
 import type { AngleInterpolateOptions } from "./types.js";
 import { angleConvert, angleParse, isAngleTypeConvertible, radianArc, radianToDegree, toRadian } from "@ixfx/geometry/angles";
-import { interpolate } from "@ixfx/numbers";
 import { piPi } from "../util/pi-pi.js";
+import { interpolateNumber } from "./number.js";
 
 export function interpolatorAngle(amount: number, a: AngleConvertible, b: AngleConvertible, options?: AngleInterpolateOptions): number;
 export function interpolatorAngle(a: AngleConvertible, b: AngleConvertible, options?: AngleInterpolateOptions): (amount: number) => number;
@@ -64,7 +64,7 @@ export function interpolatorAngleRadian(a: number, b: number, options?: AngleInt
   const limits = options?.limits ?? `clamp`;
   const arc = radianArc(a, b, options?.direction);
   return (amount: number): AngleRad => {
-    const i = interpolate(amount, 0, arc);
+    const i = interpolateNumber(amount, 0, arc);
     // console.log(`interpolatorAngleRadian: amount: ${amount} a: ${radianToDegree(a)} b: ${Math.floor(radianToDegree(b))} arc: ${Math.floor(radianToDegree(arc))} i: ${Math.floor(radianToDegree(i))} dir: ${options?.direction} eq: ${Math.floor(radianToDegree(a + i))}`);
     // if (a + i < 0) {
     //   return { unit: `rad`, value: b - i };

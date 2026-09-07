@@ -1,5 +1,5 @@
 import { interpolateString } from "./string.js";
-import { interpolate as interpolateNumber } from "./number.js";
+import {  interpolateNumber } from "./number.js";
 import {isEqualValueDefault} from "@ixfx/core/is-equal";
 import { BooleanInterpolateOptions, InterpolateOptions, StringInterpolateOptions } from "./types.js";
 import { interpolatorBoolean } from "./boolean.js";

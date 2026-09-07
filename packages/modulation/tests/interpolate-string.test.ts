@@ -1,8 +1,7 @@
-import type { StringInterpolateOptions } from '../src/types.js';
-
+import type { StringInterpolateOptions } from '../src/interpolate/types.js';
 import { Tokenise } from '@ixfx/core/text';
 import { describe, expect, it } from 'vitest';
-import { interpolateString, interpolatorByTokens, interpolatorCentered, interpolatorHuman } from '../src/interpolate/string.js';
+import { interpolateString, interpolatorByTokens, interpolatorStringCentered, interpolatorStringHuman } from '../src/interpolate/string.js';
 
 describe(`interpolateString`, () => {
   it(`character`, async () => {
@@ -67,7 +66,7 @@ describe(`interpolateString`, () => {
   it(`centered`, () => {
     let a = `abcde`;
     let b = `ABCDE`;
-    let i = interpolatorCentered(a, b);
+    let i = interpolatorStringCentered(a, b);
     expect(i(0)).toBe(`abcde`);
     expect(i(0.25)).toBe(`abCde`);
     expect(i(0.5)).toBe(`aBCDe`);
@@ -76,7 +75,7 @@ describe(`interpolateString`, () => {
 
     a = `hello`;
     b = `goodbye`;
-    i = interpolatorCentered(a, b);
+    i = interpolatorStringCentered(a, b);
     expect(i(0)).toBe(`hello`);
     expect(i(0.25)).toBe(`heodo`);
     expect(i(0.5)).toBe(`hoodb`);
@@ -85,7 +84,7 @@ describe(`interpolateString`, () => {
 
     a = `hello there apple`;
     b = `goodbye and farewell banana`;
-    i = interpolatorCentered(a, b, Tokenise.byWord());
+    i = interpolatorStringCentered(a, b, Tokenise.byWord());
     expect(i(0)).toBe(`hello there apple`);
     expect(i(0.25)).toBe(`hello and apple `);
     expect(i(0.5)).toBe(`hello and farewell `);
@@ -96,7 +95,7 @@ describe(`interpolateString`, () => {
   it(`human`, () => {
     let a = `abcde`;
     let b = `ABCDE`;
-    let i = interpolatorHuman(a, b);
+    let i = interpolatorStringHuman(a, b);
     expect(i(0)).toBe(`abcde`);
     expect(i(0.25)).toBe(`Abcde`);
     expect(i(0.5)).toBe(`ABCde`);
@@ -105,7 +104,7 @@ describe(`interpolateString`, () => {
 
     a = `hello`;
     b = `goodbye`;
-    i = interpolatorHuman(a, b);
+    i = interpolatorStringHuman(a, b);
     expect(i(0)).toBe(`hello`);
     expect(i(0.25)).toBe(`gohello`);
     expect(i(0.5)).toBe(`goodllo`);

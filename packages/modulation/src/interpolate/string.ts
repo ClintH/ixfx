@@ -4,9 +4,35 @@ import { numberTest, resultThrow, stringTest } from "@ixfx/guards";
 import { clamp } from "@ixfx/numbers";
 import { get as getEasing } from '../easing.js';
 
+/**
+ * Interpolate a string. Returns a function with amount baked-in.
+ * @param amount Interpolation amount, 0-1
+ * @param a Start string
+ * @param b End string
+ * @param options Options
+ */
 export function interpolateString(amount: number, options?: Partial<StringInterpolateOptions>): (a: string, b: string) => string;
+
+/**
+ * Interpolate a string. Returns a string
+ * @param amount Interpolation amount, 0-1
+ * @param a Start string
+ * @param b End string
+ * @param options Options
+ */
 export function interpolateString(amount: number, a: string, b: string, options?: Partial<StringInterpolateOptions>): string;
+
+/**
+ * Interpolate a string. Returns a function with start/end baked-in
+ * @param a Start string
+ * @param b End string
+ * @param options options
+ */
 export function interpolateString(a: string, b: string, options?: Partial<StringInterpolateOptions>): (amount: number) => string;
+
+/**
+ * Interpolate a string
+ */
 export function interpolateString(pos1: number | string, pos2?: string | Partial<StringInterpolateOptions>, pos3?: string | Partial<StringInterpolateOptions>, pos4?: Partial<StringInterpolateOptions>) {
   let amountProcess: undefined | ((v: number) => number);
   let limits: StringInterpolateOptions[`limits`] = `clamp`;
@@ -43,10 +69,10 @@ export function interpolateString(pos1: number | string, pos2?: string | Partial
       interpolatorForB = _b;
       switch (style) {
         case `centered`:
-          interpolatorForReals = interpolatorCentered(_a, _b, tokeniser);
+          interpolatorForReals = interpolatorStringCentered(_a, _b, tokeniser);
           break;
         case `human`:
-          interpolatorForReals = interpolatorHuman(_a, _b);
+          interpolatorForReals = interpolatorStringHuman(_a, _b);
           break;
         case `token`:
           interpolatorForReals = interpolatorByTokens(_a, _b, tokeniser);
@@ -114,7 +140,6 @@ export function interpolateString(pos1: number | string, pos2?: string | Partial
  * Interpolate by token. Returns a function that performs interpolation.
  *
  * ```js
- * import { Tokenise } from '@ixfx/core/text';
  * // Create an interpolator
  * const i = interpolatorByTokens(`hello there`, `goodbye and farewell`, Tokenise.byWord());
  * const i = interpolatorByTokens(`hello there`, `goodbye and farewell`, Tokenise.byCharacter());
@@ -159,7 +184,15 @@ export function interpolatorByTokens(
   };
 }
 
-export function interpolatorCentered(
+/**
+ * Interpolates two strings, from their center outwards. Returns a function that performs interpolation.
+ *
+ * @param a Start string
+ * @param b End string
+ * @param options Options
+ * @returns Interpolator
+ */
+export function interpolatorStringCentered(
   a: string,
   b: string,
   options: CenteredStringInterpolationOptions = Tokenise.byCharacter(),
@@ -210,7 +243,12 @@ export function interpolatorCentered(
   };
 }
 
-export function interpolatorHuman(
+/**
+ * Interpolates two strings, from their human edit distance. Returns a function that performs interpolation.
+ * @param a Start string
+ * @param b End string
+ */
+export function interpolatorStringHuman(
   a: string,
   b: string,
 ): (amount: number) => string {

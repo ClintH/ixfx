@@ -11,11 +11,11 @@ import { get as getEasing } from '../easing.js';
  *
  * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  *
- * ```js
- * import { interpolate } from '@ixfx/numbers.js';
+ * [ixfx Guide on Interpolation](https://ixfx.fun/modulation/interpolation/)
  *
+ * ```js
  * // Create function
- * const fn = interpolate(0.1);
+ * const fn = interpolateNumber(0.1);
  *
  * // Later, use to interpolate between a and b
  * fn(50, 100); // 10% of 50..100 range
@@ -25,38 +25,37 @@ import { get as getEasing } from '../easing.js';
  * @param amount Interpolation value (0..1 usually)
  * @param options Options
  */
-export function interpolate(amount: number, options?: Partial<InterpolateOptions>): (a: number, b: number) => number;
+export function interpolateNumber(amount: number, options?: Partial<InterpolateOptions>): (a: number, b: number) => number;
 
 /**
  * Interpolates between `a` and `b` by `amount`.
  *
  * Interpolation amount is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  *
+ * [ixfx Guide on Interpolation](https://ixfx.fun/modulation/interpolation/)
  * ```js
- * import { interpolate } from '@ixfx/numbers.js';
- *
  * // Get the value at 10% of range between 50-100
- * const fn = interpolate(0.1, 50, 100);
+ * const fn = interpolateNumber(0.1, 50, 100);
  * ```
  *
  * This is useful if you have dynamic interpolation amount as well as A & B values.
- * Consider using `interpolate(amount)` if you have a fixed interpolation amount.
+ * Consider using `interpolateNumber(amount)` if you have a fixed interpolation amount.
  * @param amount Interpolation value (0..1 usually)
  * @param a Starting value (corresponding to an interpolation of 0)
  * @param b End value (corresponding to an interpolation value of 1)
  * @param options Options
  */
-export function interpolate(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
+export function interpolateNumber(amount: number, a: number, b: number, options?: Partial<InterpolateOptions>): number;
 
 /**
  * Returns an interpolation function with a fixed A and B values.
  * The returned function requires an interpolation amount. This is usually 0..1, where 0 will return the A value, 1 will return the B value, 0.5 will be halfway between the two etc.
  *
- * ```js
- * import { interpolate } from '@ixfx/numbers.js';
+ * [ixfx Guide on Interpolation](https://ixfx.fun/modulation/interpolation/)
  *
+ * ```js
  * // Create function to interpolate between 50..100
- * const fn = interpolate(50, 100);
+ * const fn = interpolateNumber(50, 100);
  *
  * // Later, use to interpolate
  * fn(0.1); // 10% of 50..100 range
@@ -65,17 +64,16 @@ export function interpolate(amount: number, a: number, b: number, options?: Part
  * @param b End value (corresponding to an interpolation value of 1)
  * @param options Options
  */
-export function interpolate(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
+export function interpolateNumber(a: number, b: number, options?: Partial<InterpolateOptions>): (amount: number) => number;
 
 /**
  * Interpolates between `a` and `b` by `amount`. Aka `lerp`.
  *
- * [ixfx Guide on Interpolation](https://ixfx.fun/data/interpolation/overview/)
+ * [ixfx Guide on Interpolation](https://ixfx.fun/modulation/interpolation/)
  *
  * @example Get the halfway point between 30 and 60
  * ```js
- * import { interpolate } from '@ixfx/numbers.js';
- * interpolate(0.5, 30, 60);
+ * interpolateNumber(0.5, 30, 60);
  * ```
  *
  * See also {@link interpolatorStepped} and {@link interpolatorInterval} for functions
@@ -93,11 +91,12 @@ export function interpolate(a: number, b: number, options?: Partial<InterpolateO
  * ```js
  * interpolate(0.1, 0, 100, { easing: `quadIn` });
  * ```
- * There are a few variations when calling `interpolate`, depending on what parameters are fixed.
- * `interpolate(amount)`: returns a function that needs a & b
- * `interpolate(a, b)`:  returns a function that needs the interpolation amount
+ *
+ * There are a few variations when calling `interpolateNumber`, depending on what parameters are fixed.
+ * `interpolateNumber(amount)`: returns a function that needs a & b
+ * `interpolateNumber(a, b)`:  returns a function that needs the interpolation amount
  */
-export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOptions>, pos3?: number | Partial<InterpolateOptions>, pos4?: Partial<InterpolateOptions>) {
+export function interpolateNumber(pos1: number, pos2?: number | Partial<InterpolateOptions>, pos3?: number | Partial<InterpolateOptions>, pos4?: Partial<InterpolateOptions>) {
   let amountProcess: undefined | ((v: number) => number);
   let limits: InterpolateOptions[`limits`] = `clamp`;
 
@@ -179,9 +178,11 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
  * at which the function is called. Alternatively, consider {@link interpolatorInterval}
  * which steps on the basis of clock time.
  *
+ * [ixfx Guide on Interpolation](https://ixfx.fun/modulation/interpolation/)
+ *
  * ```js
  * // Interpolate from 0..1 by 0.01
- * const v = interpolatorStepped(0.01, 100, 200);
+ * const v = interpolatorNumberStepped(0.01, 100, 200);
  * v(); // Each call returns a value closer to target
  * // Eg: 100, 110, 120, 130 ...
  * ```
@@ -194,7 +195,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
  * then optionally A.
  *
  * ```js
- * const v = interpolatorStepped(0.1, 100, 200); // Interpolate 100->200
+ * const v = interpolatorNumberStepped(0.1, 100, 200); // Interpolate 100->200
  * v(300, 200); // Retarget to 200->300 and return result
  * v(150); // Retarget 200->150 and return result
  * ```
@@ -207,7 +208,7 @@ export function interpolate(pos1: number, pos2?: number | Partial<InterpolateOpt
  * @param options Options for interpolation
  * @returns Interpolator function
  */
-export function interpolatorStepped(incrementAmount: number, a = 0, b = 1, startInterpolationAt = 0, options?: Partial<InterpolateOptions>) {
+export function interpolatorNumberStepped(incrementAmount: number, a = 0, b = 1, startInterpolationAt = 0, options?: Partial<InterpolateOptions>) {
   let amount = startInterpolationAt;
   return (retargetB?: number, retargetA?: number): number => {
     if (retargetB !== undefined)
@@ -216,7 +217,7 @@ export function interpolatorStepped(incrementAmount: number, a = 0, b = 1, start
       a = retargetA;
     if (amount >= 1)
       return b;
-    const value = interpolate(amount, a, b, options);
+    const value = interpolateNumber(amount, a, b, options);
     amount += incrementAmount;
     return value;
   };
@@ -227,6 +228,8 @@ export function interpolatorStepped(incrementAmount: number, a = 0, b = 1, start
  * Given the same A & B values, steps will be larger if it's a longer
  * duration, and shorter if it's a smaller duration.
  *
+ * [ixfx Guide on Interpolation](https://ixfx.fun/modulation/interpolation/)
+ *
  * A function is returned, which when invoked yields a value between A..B.
  *
  * Alternatively to step through by the same amount regardless
@@ -234,14 +237,14 @@ export function interpolatorStepped(incrementAmount: number, a = 0, b = 1, start
  *
  * ```js
  * // Interpolate from 0..1 over one minute
- * const v = interpolatorInterval({mins:1});
+ * const v = interpolatorNumberInterval({mins:1});
  * v(); // Compute current value
  * ```
  *
  * Use start and end points:
  * ```js
  * // Interpolate from 100-200 over 10 seconds
- * const v = interpolatorInterval({secs:10}, 100, 200);
+ * const v = interpolatorNumberInterval({secs:10}, 100, 200);
  * v(); // Compute current value
  * ```
  * @param duration Duration for interpolation
@@ -250,7 +253,7 @@ export function interpolatorStepped(incrementAmount: number, a = 0, b = 1, start
  * @param options Options for interpolation
  * @returns Interpolator function.
  */
-export function interpolatorInterval(duration: Interval, a = 0, b = 1, options?: Partial<InterpolateOptions>) {
+export function interpolatorNumberInterval(duration: Interval, a = 0, b = 1, options?: Partial<InterpolateOptions>) {
   const durationProgression = ofTotal(duration, { clampValue: true });
   return (retargetB?: number, retargetA?: number): number => {
     const amount = durationProgression();
@@ -260,7 +263,7 @@ export function interpolatorInterval(duration: Interval, a = 0, b = 1, options?:
       a = retargetA;
     if (amount >= 1)
       return b;
-    const value = interpolate(amount, a, b, options);
+    const value = interpolateNumber(amount, a, b, options);
     return value;
   };
 }
