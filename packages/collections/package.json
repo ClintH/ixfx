@@ -78,5 +78,6 @@
       "./tree": "./dist/tree/index.js",
       "./package.json": "./package.json"
     }
-  }
+  },
+  "main": "./dist/index.js"
 }

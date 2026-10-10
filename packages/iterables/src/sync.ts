@@ -412,14 +412,15 @@ export function* repeat<T>(genCreator: () => Iterable<T>, repeatsOrSignal: numbe
   const signal = typeof repeatsOrSignal === `number` ? undefined : repeatsOrSignal;
   let count = repeats;
 
-  while (true) {
+  // `count` decrements after each pass, so guard before iterating to
+  // correctly handle zero (or negative) repeats
+  while (count > 0) {
     for (const v of genCreator()) {
       yield v;
       if (signal?.aborted) break;
     }
     if (Number.isFinite(repeats)) {
       count--;
-      if (count === 0) break;
     }
     if (signal?.aborted) break;
   }

@@ -62,5 +62,6 @@
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "engines": {
     "node": ">=24.0.0"
-  }
+  },
+  "main": "./dist/index.js"
 }

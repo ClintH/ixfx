@@ -69,12 +69,15 @@ test(`integer`, () => {
 
 test(`chance`, () => {
   const iterations = 1000;
+  // Statistical bounds sit ~4 standard deviations from the expected split
+  // (sigma ~= 1.6 percentage points at n=1000), loose enough to never trip
+  // on sampling noise while still catching gross errors.
   // 50% chance
   const r1 = repeatGrouped(iterations, () => R.chance(0.5, 0, 1), v => v === 1 ? `1` : `0`).sort();
-  expect(r1[ 0 ][ 1 ]).toBeGreaterThanOrEqual(47);
-  expect(r1[ 1 ][ 1 ]).toBeGreaterThanOrEqual(46);
-  expect(r1[ 0 ][ 1 ]).toBeLessThanOrEqual(52);
-  expect(r1[ 1 ][ 1 ]).toBeLessThanOrEqual(52);
+  expect(r1[ 0 ][ 1 ]).toBeGreaterThanOrEqual(44);
+  expect(r1[ 1 ][ 1 ]).toBeGreaterThanOrEqual(44);
+  expect(r1[ 0 ][ 1 ]).toBeLessThanOrEqual(56);
+  expect(r1[ 1 ][ 1 ]).toBeLessThanOrEqual(56);
 
   // 0% chance
   const r2 = repeatGrouped(iterations, () => R.chance(0, 0, 1), v => v === 1 ? `1` : `0`);
@@ -84,12 +87,12 @@ test(`chance`, () => {
   const r3 = repeatGrouped(iterations, () => R.chance(1, 0, 1), v => v === 1 ? `1` : `0`);
   expect(r3).toEqual([ [ '1', 100 ] ]);
 
-  // 25% chance
+  // 25% chance: expect ~25% / ~75% split
   const r4 = repeatGrouped(iterations, () => R.chance(0.25, 0, 1), v => v === 1 ? `1` : `0`).sort();
-  expect(r4[ 0 ][ 1 ]).toBeGreaterThanOrEqual(72);
-  expect(r4[ 1 ][ 1 ]).toBeGreaterThanOrEqual(21);
-  expect(r4[ 0 ][ 1 ]).toBeLessThanOrEqual(77);
-  expect(r4[ 1 ][ 1 ]).toBeLessThanOrEqual(27);
+  expect(r4[ 0 ][ 1 ]).toBeGreaterThanOrEqual(69);
+  expect(r4[ 1 ][ 1 ]).toBeGreaterThanOrEqual(19);
+  expect(r4[ 0 ][ 1 ]).toBeLessThanOrEqual(81);
+  expect(r4[ 1 ][ 1 ]).toBeLessThanOrEqual(31);
 
 });
 

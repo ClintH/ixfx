@@ -55,5 +55,6 @@
   },
   "inlinedDependencies": {
     "json5": "2.2.3"
-  }
+  },
+  "main": "./dist/index.js"
 }

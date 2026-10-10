@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { isGenFactoryNoInput, resolveToGen, resolveToAsyncGen } from '../../src/chain/utility.js';
 import type { GenFactoryNoInput, GenOrData, Gen } from '../../src/chain/types.js';
+import { func } from '../../src/chain/from/function.js';
 import { sleep } from '@ixfx/core';
 
 async function* asyncGenFromArray<V>(arr: V[]): AsyncGenerator<V> {
@@ -11,9 +12,10 @@ async function* asyncGenFromArray<V>(arr: V[]): AsyncGenerator<V> {
 
 describe('utility', () => {
   describe('isGenFactoryNoInput', () => {
-    test.skip('returns true for GenFactoryNoInput', () => {
-      // This test is skipped due to hoisting issues with function properties
-      // The functionality is covered by the resolveToGen and resolveToAsyncGen tests
+    test('returns true for GenFactoryNoInput', () => {
+      // GenFactoryNoInput is a function with metadata attached
+      const factory = func(() => 1);
+      expect(isGenFactoryNoInput(factory)).toBe(true);
     });
 
     test('returns false for regular object', () => {

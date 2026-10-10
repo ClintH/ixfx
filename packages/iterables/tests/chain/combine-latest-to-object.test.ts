@@ -34,8 +34,8 @@ describe('combineLatestToObject', () => {
     expect(results[0]).toHaveProperty('values');
   });
 
-  test.skip('handles empty object', async () => {
-    // Empty object causes infinite loop - needs fix in source
+  test('handles empty object', async () => {
+    // Zero sources yield an empty stream (guards against Promise.race([]) hang)
     const gen = combineLatestToObject({});
     
     const results: any[] = [];

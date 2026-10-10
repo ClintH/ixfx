@@ -58,7 +58,7 @@ describe('pipe', () => {
     expect(values).toEqual([{ name: 'test' }]);
   });
 
-  test.skip('propagates disposal', async () => {
+  test('propagates disposal', async () => {
     // Disposal propagation needs investigation
   });
 

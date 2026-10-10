@@ -1,6 +1,7 @@
-import { SimpleEventEmitter } from '@ixfx/events';
+import type { Interval } from '@ixfx/core';
+import { intervalToMs } from '@ixfx/core';
 import { sortByValueProperty } from '@ixfx/core/maps';
-import { intervalToMs, type Interval } from '@ixfx/core';
+import { SimpleEventEmitter } from '@ixfx/events';
 import { integerTest, resultThrow } from '@ixfx/guards';
 
 /**
@@ -65,8 +66,9 @@ export type ExpiringMapEvents<K, V> = {
  * @param options Options when creating map
  * @returns
  */
-export const create = <K, V>(options: Opts = {}): ExpiringMap<K, V> =>
-  new ExpiringMap(options);
+export function create<K, V>(options: Opts = {}): ExpiringMap<K, V> {
+  return new ExpiringMap(options);
+}
 /***
  * A map that can have a capacity limit. The elapsed time for each get/set
  * operation is maintained allowing for items to be automatically removed.
@@ -133,7 +135,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
 > {
   private capacity: number;
   private store: Map<K, Item<V>>;
-  //private keyCount: number;
+  // private keyCount: number;
   private evictPolicy;
 
   private autoDeleteElapsedMs: number;
@@ -147,7 +149,7 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
 
     resultThrow(integerTest(this.capacity, `nonZero`, `capacity`));
     this.store = new Map();
-    //this.keyCount = 0;
+    // this.keyCount = 0;
 
     if (opts.evictPolicy && this.capacity <= 0) {
       throw new Error(`evictPolicy is set, but no capacity limit is set`);
@@ -158,20 +160,24 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
 
     if (this.autoDeleteElapsedMs > 0) {
       this.autoDeleteTimer = setInterval(
-        () => { this.#maintain(); },
-        Math.max(1000, this.autoDeleteElapsedMs * 2)
+        () => {
+          this.#maintain();
+        },
+        Math.max(1000, this.autoDeleteElapsedMs * 2),
       );
     }
   }
 
   dispose(): void {
-    if (this.disposed) return;
+    if (this.disposed)
+      return;
     this.disposed = true;
     if (this.autoDeleteTimer) {
-      clearInterval(this.autoDeleteTimer)
+      clearInterval(this.autoDeleteTimer);
       this.autoDeleteTimer = undefined;
     }
   }
+
   /**
    * Returns the number of keys being stored.
    */
@@ -179,19 +185,19 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
     return this.store.size;// keyCount;
   }
 
-  *entries(): IterableIterator<[ k: K, v: V ]> {
+  * entries(): IterableIterator<[ k: K, v: V ]> {
     for (const entry of this.store.entries()) {
-      yield [ entry[ 0 ], entry[ 1 ].value ];
+      yield [entry[0], entry[1].value];
     }
   }
 
-  *values(): IterableIterator<V> {
+  * values(): IterableIterator<V> {
     for (const v of this.store.values()) {
       yield v.value;
     }
   }
 
-  *keys(): IterableIterator<K> {
+  * keys(): IterableIterator<K> {
     yield* this.store.keys();
   }
 
@@ -202,8 +208,9 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    */
   elapsedSet(key: K): number | undefined {
     const v = this.store.get(key);
-    if (typeof v === `undefined`) return;
-    return Date.now() - v.lastSet;
+    if (typeof v === `undefined`)
+      return;
+    return performance.now() - v.lastSet;
   }
 
   /**
@@ -213,8 +220,9 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    */
   elapsedGet(key: K): number | undefined {
     const v = this.store.get(key);
-    if (typeof v === `undefined`) return;
-    return Date.now() - v.lastGet;
+    if (typeof v === `undefined`)
+      return;
+    return performance.now() - v.lastGet;
   }
 
   /**
@@ -255,9 +263,10 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    */
   delete(key: K): boolean {
     const value = this.store.get(key);
-    if (!value) return false;
+    if (!value)
+      return false;
     const d = this.store.delete(key);
-    //this.keyCount = this.keyCount - 1;
+    // this.keyCount = this.keyCount - 1;
     this.fireEvent(`removed`, {
       key,
       value: value.value,
@@ -283,27 +292,32 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    */
   touch(key: K): boolean {
     const v = this.store.get(key);
-    if (!v) return false;
+    if (!v)
+      return false;
     this.store.set(key, {
       ...v,
-      lastSet: Date.now(),
-      lastGet: Date.now(),
+      lastSet: performance.now(),
+      lastGet: performance.now(),
     });
     return true;
   }
 
   private findEvicteeKey(): K | undefined {
-    if (this.evictPolicy === `none`) return;
+    if (this.evictPolicy === `none`)
+      return;
     let sortBy = ``;
-    if (this.evictPolicy === `oldestGet`) sortBy = `lastGet`;
-    else if (this.evictPolicy === `oldestSet`) sortBy = `lastSet`;
-    else throw new Error(`Unknown eviction policy ${ this.evictPolicy }`);
+    if (this.evictPolicy === `oldestGet`)
+      sortBy = `lastGet`;
+    else if (this.evictPolicy === `oldestSet`)
+      sortBy = `lastSet`;
+    else throw new Error(`Unknown eviction policy ${this.evictPolicy}`);
     const sorted = sortByValueProperty(this.store, sortBy);
-    return sorted[ 0 ][ 0 ];
+    return sorted[0][0];
   }
 
   #maintain() {
-    if (this.autoDeletePolicy === `none`) return;
+    if (this.autoDeletePolicy === `none`)
+      return;
     this.deleteWithElapsed(this.autoDeleteElapsedMs, this.autoDeletePolicy);
   }
 
@@ -316,39 +330,39 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
    * // Delete things that were set 1s ago
    * em.deleteWithElapsed(1000, `set`);
    * ```
-   * 
+   *
    * @param interval Interval
    * @param property Basis for deletion 'get','set' or 'either'
    * @returns Items removed
    */
   deleteWithElapsed(
     interval: Interval,
-    property: `get` | `set` | `either`
-  ): [ k: K, v: V ][] {
-    const entries = [ ...this.store.entries() ];
-    const prune: [ k: K, v: V ][] = [];
+    property: `get` | `set` | `either`,
+  ): Array<[ k: K, v: V ]> {
+    const entries = [...this.store.entries()];
+    const prune: Array<[ k: K, v: V ]> = [];
     const intervalMs = intervalToMs(interval, 1000);
     const now = performance.now();
     for (const entry of entries) {
-      const elapsedGet = now - entry[ 1 ].lastGet;
-      const elapsedSet = now - entry[ 1 ].lastSet;
-      const elapsed =
-        property === `get`
+      const elapsedGet = now - entry[1].lastGet;
+      const elapsedSet = now - entry[1].lastSet;
+      const elapsed
+        = property === `get`
           ? elapsedGet
           : (property === `set`
-            ? elapsedSet
-            : Math.max(elapsedGet, elapsedSet));
+              ? elapsedSet
+              : Math.max(elapsedGet, elapsedSet));
       if (elapsed >= intervalMs) {
-        prune.push([ entry[ 0 ], entry[ 1 ].value ]);
+        prune.push([entry[0], entry[1].value]);
       }
     }
 
     for (const entry of prune) {
-      this.store.delete(entry[ 0 ]);
-      //this.keyCount = this.keyCount - 1;
+      this.store.delete(entry[0]);
+      // this.keyCount = this.keyCount - 1;
       const eventArguments = {
-        key: entry[ 0 ],
-        value: entry[ 1 ],
+        key: entry[0],
+        value: entry[1],
       };
       this.fireEvent(`expired`, eventArguments);
       this.fireEvent(`removed`, eventArguments);
@@ -384,11 +398,11 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
       // Evict first
       const key = this.findEvicteeKey();
       if (!key) {
-        throw new Error(`ExpiringMap full (capacity: ${ this.capacity })`);
+        throw new Error(`ExpiringMap full (capacity: ${this.capacity})`);
       }
       const existing = this.store.get(key);
       this.store.delete(key);
-      //this.keyCount = this.keyCount - 1;
+      // this.keyCount = this.keyCount - 1;
       if (existing) {
         const eventArguments = { key, value: existing.value };
         this.fireEvent(`expired`, eventArguments);
@@ -396,11 +410,11 @@ export class ExpiringMap<K, V> extends SimpleEventEmitter<
       }
     }
 
-    //this.keyCount++;
+    // this.keyCount++;
     this.store.set(key, {
       lastGet: 0,
       lastSet: performance.now(),
-      value: value,
+      value,
     });
 
     this.fireEvent(`newKey`, { key, value });

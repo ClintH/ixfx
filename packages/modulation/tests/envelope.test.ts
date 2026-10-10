@@ -1,57 +1,93 @@
-/* eslint-disable unicorn/prevent-abbreviations */
-import { test, expect, assert } from 'vitest';
-import { isApprox } from '@ixfx/numbers';
-import { sleep, elapsedSince } from '@ixfx/core';
+import type { Timer } from '@ixfx/flow';
+import { expect, it } from 'vitest';
 import * as Envelopes from '../src/envelope.js';
 
-test(`as-iterator`, async done => {
+// Controllable clock injected via the `timeSource` option: makes the
+// envelope's stage timing fully deterministic (no real sleeping).
+function clock() {
+  let now = 0;
+  let epoch = 0;
+  return {
+    now: () => now,
+    advance: (ms: number) => {
+      now += ms;
+    },
+    timerSource: (): Timer => ({
+      reset: () => {
+        epoch = now;
+      },
+      get elapsed() {
+        return now - epoch;
+      },
+    }),
+  };
+}
+
+it(`as-iterator`, () => {
+  const c = clock();
   const e = new Envelopes.Adsr({
     attackDuration: 100,
     decayDuration: 100,
-    releaseDuration: 100
+    releaseDuration: 100,
+    timeSource: c.timerSource,
   });
-  const elapsed = elapsedSince();
-  let seenA = false;
-  let seenD = false;
-  let seenR = false;
-  // eslint-disable-next-line @typescript-eslint/await-thenable
-  for await (const _v of e) {
-    const cc = e.compute();
-    if (cc[ 0 ] === `attack`) seenA = true;
-    if (cc[ 0 ] === `decay`) seenD = true;
-    if (cc[ 0 ] === `release`) seenR = true;
-    await sleep(50);
-    //if (elapsed() > 5000) done.fail(`Did not complete in time`);
-    assert(elapsed() < 5000, `Did not complete in time`)
+  e.trigger();
+
+  const order: string[] = [];
+  let guard = 0;
+  while (!e.isDone && guard++ < 100) {
+    c.advance(10);
+    const [state] = e.compute();
+    if (state !== undefined && state !== order.at(-1))
+      order.push(state);
   }
-  // Check all stages seen
-  expect(seenA).toBe(true);
-  expect(seenD).toBe(true);
-  expect(seenR).toBe(true);
-  const finalTime = elapsed();
-  expect(finalTime > 300 && finalTime < 320).toBe(true);
+
+  expect(e.isDone).toBe(true);
+  // Three stages of 100ms of envelope time. The state machine flips to
+  // 'complete' on the sample after elapsed strictly exceeds the final
+  // stage boundary, hence 300 + 2 x 10ms sampling.
+  expect(c.now()).toBe(320);
+  expect(order[0]).toBe(`attack`);
+  expect(order).toContain(`decay`);
+  expect(order).toContain(`release`);
+  expect(order.at(-1)).toBe(`complete`);
 });
 
-test(`as-function`, async done => {
-  // TODO: Not really testing much
+it(`as-function`, () => {
+  const c = clock();
   const e = Envelopes.adsr({
     attackDuration: 300,
     decayDuration: 300,
     releaseDuration: 300,
     releaseLevel: 0,
     initialLevel: 0.1,
-    sustainLevel: 1
+    sustainLevel: 1,
+    timeSource: c.timerSource,
   });
-  //t.timeout(5000);
-  const elapsed = elapsedSince();
-  while (true) {
-    const v = await e();
-    await sleep(100);
-    //if (elapsed() > 2000) done.fail(`Envelope took too long: ${ elapsed() }`);
-    assert(elapsed() < 2000, `Did not complete in time: ${ elapsed() }`)
 
-    if (v === 0) break;
+  // Sample every 100ms of envelope time until the envelope completes
+  // (releaseLevel of 0 signals completion)
+  let samples = 0;
+  let value = Number.NaN;
+  while (value !== 0 && samples++ < 100) {
+    c.advance(100);
+    value = e();
   }
-  const total = elapsed();
-  expect(isApprox(0.2, 900, total)).toBe(true);
+  expect(value).toBe(0);
+  // Trigger happens on first call (t=100), then 3 x 300ms stages
+  expect(c.now()).toBe(1000);
+});
+
+// Smoke test for the default wall-clock time source (no injection)
+it(`real-timer smoke`, async () => {
+  const e = new Envelopes.Adsr({
+    attackDuration: 20,
+    decayDuration: 10,
+    releaseDuration: 10,
+  });
+  e.trigger();
+  await new Promise(resolve => setTimeout(resolve, 30));
+  const [state] = e.compute();
+  expect(state).not.toBe(`attack`);
+  expect(e.isDone).toBe(false);
 });

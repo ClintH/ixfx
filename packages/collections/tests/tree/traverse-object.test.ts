@@ -252,7 +252,7 @@ test(`as-traversable-object`, () => {
   ).toBe(true);
 
   const r1a = TT.findAnyChildByValue(r1, { name: 'name', sourceValue: 'John' }, isEqualValuePartial);
-  expect(r1a).toBeTruthy();
+  expect(r1a?.getValue()).toMatchObject({ name: 'name', sourceValue: 'John' });
   if (r1a !== undefined) {
     expect(TT.hasAnyChild(r1, r1a)).toBe(true);
     // const parents = [ ...TraversableTree.parents(r1a) ];

@@ -1,17 +1,12 @@
 import type { WithEvents } from "./types.js";
 
-export const fromEvent = <V>(
-  eventSource: WithEvents,
-  eventType: string
-): AsyncIterator<any> => {
-  const pullQueue: Array<any> = [];
-  const pushQueue: Array<any> = [];
+export function fromEvent<V>(eventSource: WithEvents, eventType: string): AsyncIterator<any> {
+  const pullQueue: any[] = [];
+  const pushQueue: any[] = [];
   let done = false;
   const pushValue = (args: any) => {
     if (pullQueue.length > 0) {
-      //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const resolver = pullQueue.shift();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       resolver(...args);
     } else {
       pushQueue.push(args);
@@ -21,9 +16,8 @@ export const fromEvent = <V>(
   const pullValue = (): Promise<V> =>
     new Promise<V>((resolve) => {
       if (pushQueue.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const arguments_ = pushQueue.shift();
-        // @ts-expect-error
+        // @ts-expect-error arguments_ is variadic args saved from push()
         resolve(...arguments_);
       } else {
         pullQueue.push(resolve);
@@ -38,26 +32,28 @@ export const fromEvent = <V>(
 
   const r: AsyncIterator<V> = {
     next: async (): Promise<IteratorResult<V>> => {
-      if (done) return { done: true, value: undefined };
+      if (done)
+        return { done: true, value: undefined };
       return {
         done: false,
         value: await pullValue(),
       };
     },
-    //eslint-disable-next-line @typescript-eslint/require-await
+    // eslint-disable-next-line ts/require-await
     return: async (): Promise<IteratorResult<V>> => {
       done = true;
       eventSource.removeEventListener(eventType, handler);
       return { done: true, value: undefined };
     },
-    //eslint-disable-next-line @typescript-eslint/require-await
+    // eslint-disable-next-line ts/require-await
     throw: async (error: any): Promise<IteratorResult<V>> => {
       done = true;
-      return {
-        done: true,
-        value: Promise.reject(new Error(error)),
-      };
+      eventSource.removeEventListener(eventType, handler);
+      // Returning a rejected promise here (as this used to) would create an
+      // unhandled rejection, since nothing awaits `value` on a done result.
+      // The caller already holds the error they passed in.
+      return { done: true, value: error };
     },
   };
   return r;
-};
+}

@@ -49,5 +49,6 @@
   "engines": {
     "node": ">=24.0.0"
   },
-  "scripts": {}
+  "scripts": {},
+  "main": "./dist/index.js"
 }

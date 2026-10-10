@@ -137,8 +137,14 @@ describe('controller', () => {
       expect(controller.state).toBe('stopped');
     });
 
-    test.skip('throws error if no iterator provided', () => {
-      // Skip: error is thrown when remake() is called, not at creation
+    test('throws error if no iterator provided', () => {
+      const options = {
+        onValue: () => true,
+        // @ts-expect-error deliberately omitting required iterator to test runtime guard
+        iterator: undefined,
+      };
+      const controller = Iterables.iteratorController(options);
+      expect(() => controller.start()).toThrow(`No source iterator`);
     });
 
     test('multiple start calls do not create multiple loops', async () => {

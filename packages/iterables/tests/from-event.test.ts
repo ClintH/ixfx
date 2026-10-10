@@ -103,8 +103,26 @@ describe('from-event', () => {
       expect(result.done).toBe(true);
     });
 
-    test.skip('throw() stops iterator', async () => {
-      // Skip: implementation returns Promise.reject in value, causing unhandled rejection
+    test('throw() stops iterator', async () => {
+      let eventHandler: any;
+      const mockEventSource = {
+        addEventListener: (type: string, handler: any) => {
+          eventHandler = handler;
+        },
+        removeEventListener: () => {
+          eventHandler = undefined;
+        }
+      };
+
+      const iterator = fromEvent(mockEventSource, 'test');
+
+      const result = await iterator.throw!(`stop`);
+      expect(result.done).toBe(true);
+      // Listener is detached like with return()
+      expect(eventHandler).toBeUndefined();
+
+      const next = await iterator.next();
+      expect(next.done).toBe(true);
     });
 
     test('handles multiple listeners waiting', async () => {

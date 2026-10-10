@@ -250,12 +250,19 @@ describe('sync', () => {
   });
 
   describe('repeat', () => {
-    test.skip('repeats iterable specified times', () => {
-      // Skip: memory issue needs investigation  
+    test('repeats iterable specified times', () => {
+      const gen = Sync.repeat(() => [ 1, 2 ], 3);
+      expect([ ...gen ]).toEqual([ 1, 2, 1, 2, 1, 2 ]);
     });
 
-    test.skip('handles zero repeats', () => {
-      // Skip: memory issue needs investigation
+    test('handles zero repeats', () => {
+      let calls = 0;
+      const gen = Sync.repeat(() => {
+        calls++;
+        return [ 1 ];
+      }, 0);
+      expect([ ...gen ]).toEqual([]);
+      expect(calls).toBe(0);
     });
   });
 
@@ -274,12 +281,14 @@ describe('sync', () => {
   });
 
   describe('zip', () => {
-    test.skip('zips multiple iterables', () => {
-      // Skip: memory issue needs investigation
+    test('zips multiple iterables', () => {
+      const gen = Sync.zip([ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ]);
+      expect([ ...gen ]).toEqual([ [ 1, 4, 7 ], [ 2, 5, 8 ], [ 3, 6, 9 ] ]);
     });
 
-    test.skip('stops at shortest iterable', () => {
-      // Skip: memory issue needs investigation
+    test('stops at shortest iterable', () => {
+      const gen = Sync.zip([ 1, 2, 3, 4 ], [ 5, 6 ]);
+      expect([ ...gen ]).toEqual([ [ 1, 5 ], [ 2, 6 ] ]);
     });
   });
 

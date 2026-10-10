@@ -8,4 +8,11 @@ export class QueueMutable<V> {
   dequeue(): V | undefined {
     return this.#store.shift();
   }
+
+  /**
+   * Removes and returns all remaining values, in queue order.
+   */
+  dequeueRemaining(): V[] {
+    return this.#store.splice(0);
+  }
 }

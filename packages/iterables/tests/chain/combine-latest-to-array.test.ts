@@ -30,8 +30,8 @@ describe('combineLatestToArray', () => {
     expect(results).toEqual([[1], [2], [3]]);
   });
 
-  test.skip('handles empty source array', async () => {
-    // Empty array causes infinite loop - needs fix in source
+  test('handles empty source array', async () => {
+    // Zero sources yield an empty stream (guards against Promise.race([]) hang)
     const gen = combineLatestToArray([]);
     
     const results: any[][] = [];

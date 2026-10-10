@@ -1,56 +1,58 @@
-import { test, expect } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { rateMinimum } from '../src/rate-minimum.js';
-import { sleep } from '@ixfx/core';
 
-// In this case we don't expect fallback
-// to be triggered because rm() is being invoked faster than rateMin's interval
-test(`rateMinimum-0`, async () => {
+// Calls faster than 'interval': fallback never triggers
+it(`rateMinimum-0`, () => {
+  vi.useFakeTimers();
   let fallbackCalled = 0;
   let wtcCalled = 0;
-  const rm = rateMinimum({
+  const rm = rateMinimum<number>({
     interval: 100,
-    fallback() {
+    fallback: () => {
       fallbackCalled++;
-      return Math.random();
+      return -1;
     },
-    whatToCall(args) {
+    whatToCall: () => {
       wtcCalled++;
-      return Math.random();
     },
   });
 
-  const t1 = setInterval(() => {
-    rm(Math.random());
-    if (wtcCalled >= 10) {
-      expect(fallbackCalled).toBe(0);
-      clearInterval(t1);
-    }
-  }, 50);
-  await sleep(1000);
+  for (let i = 0; i < 10; i++) {
+    vi.advanceTimersByTime(50);
+    rm(i);
+  }
+  expect(wtcCalled).toBe(10);
+  expect(fallbackCalled).toBe(0);
+
+  // Stop calling: after 'interval' elapses, fallback kicks in
+  vi.advanceTimersByTime(100);
+  expect(fallbackCalled).toBe(1);
+  expect(wtcCalled).toBe(11);
+  vi.useRealTimers();
 });
 
-// In this case we expect fallback to be triggered half the times
-test(`rateMinimum-1`, async () => {
+// Calls slower than 'interval': fallback fires once per gap
+it(`rateMinimum-1`, () => {
+  vi.useFakeTimers();
   let fallbackCalled = 0;
   let wtcCalled = 0;
-  const rm = rateMinimum({
+  const rm = rateMinimum<number>({
     interval: 100,
-    fallback() {
+    fallback: () => {
       fallbackCalled++;
-      return Math.random();
+      return -1;
     },
-    whatToCall(args) {
+    whatToCall: () => {
       wtcCalled++;
     },
   });
 
-  const t1 = setInterval(() => {
-    rm(Math.random());
-    if (wtcCalled >= 10) {
-      expect(fallbackCalled).toBe(5);
-      clearInterval(t1);
-    }
-  }, 150);
-  await sleep(1000);
-
+  for (let i = 0; i < 5; i++) {
+    vi.advanceTimersByTime(150);
+    rm(i);
+  }
+  // 5 calls plus one fallback per 150ms gap
+  expect(fallbackCalled).toBe(5);
+  expect(wtcCalled).toBe(10);
+  vi.useRealTimers();
 });

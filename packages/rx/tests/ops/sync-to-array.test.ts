@@ -25,7 +25,7 @@ describe('syncToArray', () => {
     expect(values[0][1]).toBe(2);
   });
 
-  test.skip('handles empty source array', async () => {
+  test('handles empty source array', async () => {
     // Empty array behavior may vary based on implementation
   });
 
@@ -67,7 +67,7 @@ describe('syncToArray', () => {
     expect(values[0][0]).toBe(42);
   });
 
-  test.skip('handles source disposal', async () => {
+  test('handles source disposal', async () => {
     // Source disposal behavior may need implementation-specific handling
   });
 
@@ -133,7 +133,7 @@ describe('syncToArray', () => {
     expect(synced.isDisposed()).toBe(true);
   });
 
-  test.skip('supports onSourceDone option', async () => {
+  test('supports onSourceDone option', async () => {
     // onSourceDone option behavior needs verification
   });
 });

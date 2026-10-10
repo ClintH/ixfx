@@ -87,5 +87,6 @@
   "dependencies": {
     "@ixfx/debug": "workspace:*",
     "@ixfx/guards": "workspace:*"
-  }
+  },
+  "main": "./dist/index.js"
 }

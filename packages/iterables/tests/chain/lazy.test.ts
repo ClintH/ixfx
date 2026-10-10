@@ -201,9 +201,9 @@ describe('lazy', () => {
   });
 
   describe('fromFunction', () => {
-    test.skip('fromFunction provides values', async () => {
-      // This test is skipped - fromFunction creates a GenFactoryNoInput
-      // which requires special handling in the chain
+    test('fromFunction provides values', async () => {
+      // fromFunction creates a GenFactoryNoInput: an endless producer that
+      // runs until the callback returns undefined, so cap it with take()
       let counter = 0;
       const chain = lazy<number, number>()
         .fromFunction(() => {
@@ -211,7 +211,7 @@ describe('lazy', () => {
           return counter;
         })
         .take(5);
-      
+
       const result = await chain.asArray();
       expect(result).toEqual([1, 2, 3, 4, 5]);
     });

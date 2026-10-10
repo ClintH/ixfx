@@ -122,5 +122,6 @@
   },
   "inlinedDependencies": {
     "bezier-js": "6.1.4"
-  }
+  },
+  "main": "./dist/index.js"
 }

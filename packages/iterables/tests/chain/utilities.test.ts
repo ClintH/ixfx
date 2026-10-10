@@ -66,8 +66,9 @@ describe('chain utilities', () => {
   });
 
   describe('mergeFlat', () => {
-    test.skip('merges multiple sources', async () => {
-      // mergeFlat has timing issues with generators
+    test('merges multiple sources', async () => {
+      // mergeFlat buffers values; sources completing before the consumer loop
+      // wakes must still drain (regression test for lost values)
       async function* source1() {
         yield 1;
         yield 2;
@@ -93,8 +94,9 @@ describe('chain utilities', () => {
       expect(results).toContain('b');
     });
 
-    test.skip('handles single source', async () => {
-      // mergeFlat has timing issues with generators
+    test('handles single source', async () => {
+      // mergeFlat buffers values; sources completing before the consumer loop
+      // wakes must still drain (regression test for lost values)
       async function* source() {
         yield 1;
         yield 2;
@@ -111,8 +113,8 @@ describe('chain utilities', () => {
       expect(results).toEqual([1, 2, 3]);
     });
 
-    test.skip('handles arrays', async () => {
-      // mergeFlat has timing issues
+    test('handles arrays', async () => {
+      // Regression: buffered values must drain even for fast sources
       const gen = mergeFlat([1, 2], ['a', 'b']);
       const results: any[] = [];
       

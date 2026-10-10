@@ -1,18 +1,20 @@
+import type { Timer, TimerSource } from '@ixfx/flow';
+import type { AdsrEvents, AdsrStateTransitions, AdsrTimingOpts } from './types.js';
 import { SimpleEventEmitter } from '@ixfx/events';
-import { elapsedMillisecondsAbsolute, type Timer, type TimerSource } from '@ixfx/flow';
-import { adsrStateTransitions, type AdsrEvents, type AdsrStateTransitions, type AdsrTimingOpts } from './types.js';
+import { elapsedMillisecondsAbsolute } from '@ixfx/flow';
 import { StateMachineWithEvents } from '@ixfx/flow/state-machine';
+import { adsrStateTransitions } from './types.js';
 
 export const defaultAdsrTimingOpts = {
   attackDuration: 600,
   decayDuration: 200,
   releaseDuration: 800,
-  shouldLoop: false
-} as const
+  shouldLoop: false,
+} as const;
 
 /**
  * Base class for an ADSR envelope.
- * 
+ *
  * It outputs values on a scale of 0..1 corresponding to each phase.
  */
 export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
@@ -44,7 +46,7 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
 
     this.#sm = new StateMachineWithEvents<AdsrStateTransitions>(
       adsrStateTransitions,
-      { initial: `attack` }
+      { initial: `attack` },
     );
 
     this.#sm.addEventListener(`change`, (event) => {
@@ -58,13 +60,14 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
       super.fireEvent(`complete`, event);
     });
 
-    this.#timeSource = () => elapsedMillisecondsAbsolute();
+    this.#timeSource = opts.timeSource ?? ((): Timer => elapsedMillisecondsAbsolute());
     this.#holding = this.#holdingInitial = false;
     this.decayDurationTotal = this.attackDuration + this.decayDuration;
   }
 
   dispose(): void {
-    if (this.#disposed) return;
+    if (this.#disposed)
+      return;
     this.#sm.dispose();
   }
 
@@ -77,18 +80,19 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
    * @returns _True_ if state was changed
    */
   protected switchStateIfNeeded(allowLooping: boolean): boolean {
-    if (this.#timer === undefined) return false;
+    if (this.#timer === undefined)
+      return false;
     let elapsed = this.#timer.elapsed;
     const wasHeld = this.#holdingInitial && !this.#holding;
 
     // Change through states for as long as needed
     let hasChanged = false;
-    //console.log(`AdsrBase.switchStateIfNeeded elapsed: ${ elapsed } wasHeld: ${ wasHeld }`);
+    // console.log(`AdsrBase.switchStateIfNeeded elapsed: ${ elapsed } wasHeld: ${ wasHeld }`);
     let state = this.#sm.state;
     do {
       hasChanged = false;
       state = this.#sm.state;
-      //console.log(`  AdsrBase.switchStateIfNeeded: ${ state }`);
+      // console.log(`  AdsrBase.switchStateIfNeeded: ${ state }`);
       switch (state) {
         case `attack`: {
           if (elapsed > this.attackDuration || wasHeld) {
@@ -137,13 +141,14 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
    */
   protected computeRaw(
     allowStateChange = true,
-    allowLooping = true
+    allowLooping = true,
   ): [ stage: string | undefined, amount: number, prevStage: string ] {
     if (this.#timer === undefined) {
-      return [ undefined, 0, this.#sm.state ];
+      return [undefined, 0, this.#sm.state];
     }
     // Change state if necessary based on elapsed time
-    if (allowStateChange) this.switchStateIfNeeded(allowLooping);
+    if (allowStateChange)
+      this.switchStateIfNeeded(allowLooping);
 
     const previousStage = this.#sm.state;
     const elapsed = this.#timer.elapsed;
@@ -168,13 +173,13 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
         break;
       }
       case `complete`: {
-        return [ `complete`, 1, previousStage ];
+        return [`complete`, 1, previousStage];
       }
       default: {
-        throw new Error(`State machine in unknown state: ${ state }`);
+        throw new Error(`State machine in unknown state: ${state}`);
       }
     }
-    return [ state, relative, previousStage ];
+    return [state, relative, previousStage];
   }
 
   /**
@@ -190,17 +195,17 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
 
   /**
    * Triggers envelope, optionally _holding_ it.
-   * 
+   *
    * If `hold` is _false_ (default), envelope will run through all stages,
    * but sustain stage won't have an affect.
-   * 
-   * If `hold` is _true_, it will run to, and stay at the sustain stage. 
+   *
+   * If `hold` is _true_, it will run to, and stay at the sustain stage.
    * Use {@link release} to later release the envelope.
    *
-   * If event is already trigged it will be _retriggered_. 
+   * If event is already trigged it will be _retriggered_.
    * Initial value depends on `opts.retrigger`
-   * * _false_ (default): envelope continues at current value.
-   * * _true_: envelope value resets to `opts.initialValue`.
+   * _false_ (default): envelope continues at current value.
+   * _true_: envelope value resets to `opts.initialValue`.
    *
    * @param hold If _true_ envelope will hold at sustain stage
    */
@@ -224,10 +229,11 @@ export class AdsrBase extends SimpleEventEmitter<AdsrEvents> {
   /**
    * Release if 'trigger(true)' was previouslly called.
    * Has no effect if not triggered or held.
-   * @returns 
+   * @returns
    */
   release(): void {
-    if (this.isDone || !this.#holdingInitial) return; // Was never holding or done
+    if (this.isDone || !this.#holdingInitial)
+      return; // Was never holding or done
 
     // Setting holding flag to false, computeRaw will change state
     this.#holding = false;

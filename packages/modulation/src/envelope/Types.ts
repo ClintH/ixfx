@@ -1,3 +1,5 @@
+import type { TimerSource } from '@ixfx/flow';
+
 export type EnvelopeOpts = AdsrOpts & AdsrTimingOpts;
 /**
  * Options for the ADSR envelope.
@@ -50,6 +52,13 @@ export type AdsrTimingOpts = Partial<{
   readonly shouldLoop: boolean;
 
   /**
+   * Timer source. Defaults to a wall-clock timer.
+   * Provide an alternative for testing, or to drive by another unit (eg. ticks).
+   * @type {TimerSource}
+   */
+  readonly timeSource: TimerSource;
+
+  /**
    * Duration for attack stage
    * Unit depends on timer source
    * @type {number}
@@ -78,14 +87,11 @@ export type AdsrIterableOpts = {
 /**
  * State change event
  */
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface StateChangeEvent {
   readonly newState: string;
   readonly priorState: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface CompleteEvent {
   /* no-op */
 }
@@ -102,11 +108,10 @@ export const adsrStateTransitions: Readonly<{
   release: string[];
   complete: null;
 }> = Object.freeze({
-  attack: [ `decay`, `release` ],
-  decay: [ `sustain`, `release` ],
-  sustain: [ `release` ],
-  release: [ `complete` ],
+  attack: [`decay`, `release`],
+  decay: [`sustain`, `release`],
+  sustain: [`release`],
+  release: [`complete`],
   complete: null,
 });
 export type AdsrStateTransitions = Readonly<typeof adsrStateTransitions>;
-

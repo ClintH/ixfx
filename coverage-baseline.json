@@ -1,7 +1,7 @@
 {
   "total": {
-    "stmts": 59.35,
-    "branch": 56.24
+    "stmts": 59.55,
+    "branch": 56.44
   },
   "packages": {
     "arrays": {
@@ -29,8 +29,8 @@
       "branch": 50
     },
     "flow": {
-      "stmts": 77.58,
-      "branch": 72.31
+      "stmts": 77.93,
+      "branch": 73.11
     },
     "geometry": {
       "stmts": 72.55,
@@ -45,12 +45,12 @@
       "branch": 0.95
     },
     "iterables": {
-      "stmts": 78.27,
-      "branch": 69.06
+      "stmts": 81.11,
+      "branch": 71.28
     },
     "modulation": {
-      "stmts": 63.76,
-      "branch": 55.33
+      "stmts": 64.07,
+      "branch": 55.92
     },
     "numbers": {
       "stmts": 88.58,

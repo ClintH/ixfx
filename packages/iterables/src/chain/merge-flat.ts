@@ -1,17 +1,17 @@
+import type { GenFactoryNoInput, GenOrData } from "./types.js";
 import { sleep } from "@ixfx/core";
 import { QueueMutable } from "../util/queueMutable.js";
-import type { GenFactoryNoInput, GenOrData } from "./types.js";
 import { resolveToAsyncGen } from "./utility.js";
 /**
  * Merge values from several sources into one stream, interleaving values.
  * When all streams are complete it finishes.
- * 
+ *
  * Alternatively:
  * - {@link combineLatestToArray}/{@link combineLatestToObject} emits snapshots of all the generators, as quickly as the fastest one
  * - {@link syncToArray}/{@link syncToObject} which releases a set of results when all inputs have emitted a value
- * @param sources 
+ * @param sources
  */
-export async function* mergeFlat<Out>(...sources: (GenOrData<any> | GenFactoryNoInput<any>)[]): AsyncGenerator<Out> {
+export async function* mergeFlat<Out>(...sources: Array<GenOrData<any> | GenFactoryNoInput<any>>): AsyncGenerator<Out> {
   const sourcesInput = sources.map(source => resolveToAsyncGen(source));
   const buffer = new QueueMutable<Out>();
   let completed = 0;
@@ -27,14 +27,12 @@ export async function* mergeFlat<Out>(...sources: (GenOrData<any> | GenFactoryNo
       completed++;
     } else {
       buffer.enqueue(x.value as Out);
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      setTimeout(() => schedule(source), 1);
+      setTimeout(schedule, 1, source);
     }
-  }
+  };
 
   for (const source of sourcesInput) {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    setTimeout(() => schedule(source), 1);
+    setTimeout(schedule, 1, source);
   }
 
   const loopSpeed = 10;
@@ -50,5 +48,11 @@ export async function* mergeFlat<Out>(...sources: (GenOrData<any> | GenFactoryNo
       loopFactor = 1;
     }
     await sleep(loopSpeed * loopFactor);
+  }
+
+  // Sources can all complete before the consumer loop wakes up, leaving
+  // values in the buffer. Drain them.
+  for (const d of buffer.dequeueRemaining()) {
+    yield d;
   }
 }

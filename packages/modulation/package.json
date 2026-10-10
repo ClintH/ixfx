@@ -73,5 +73,6 @@
     "@ixfx/guards": "workspace:*",
     "@ixfx/numbers": "workspace:*",
     "@ixfx/random": "workspace:*"
-  }
+  },
+  "main": "./dist/index.js"
 }

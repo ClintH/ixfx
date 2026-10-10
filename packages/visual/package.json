@@ -73,5 +73,6 @@
   },
   "inlinedDependencies": {
     "colorizr": "4.0.1"
-  }
+  },
+  "main": "./dist/index.js"
 }
