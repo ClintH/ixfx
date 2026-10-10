@@ -32,7 +32,12 @@ pnpx vitest run ./packages/collections/tests/tree/tree-pathed.test.ts --environm
 
 Generate coverage report, outputs to ./coverage
 ```
-pnpm run coverage
+pnpm run test:coverage
+```
+
+Check coverage has not regressed against the ratchet baseline (see TESTING-PLAN.md):
+```
+pnpm run coverage:check
 ```
 
 ## Coding conventions
@@ -60,9 +65,9 @@ pnpm run release
 pnpm run bundle:publish
 ```
 
-## Running a visual test
+## Running a demo
 
-For example:
+Manual browser demos/harnesses live in `./demos` (unit tests live in `packages/*/tests`). For example:
 ```
-pnpx vite serve ./tests/io/midi/
+pnpx vite serve ./demos/io/midi/
 ```

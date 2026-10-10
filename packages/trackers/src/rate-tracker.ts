@@ -1,67 +1,105 @@
 import type { Interval } from "@ixfx/core";
-import { type Timeout, timeout } from "@ixfx/flow";
+import type { Timeout } from "@ixfx/flow";
+import { timeout } from "@ixfx/flow";
 
+/**
+ * Options for a {@link RateTracker}
+ */
 export type RateTrackerOpts = Readonly<{
   /**
- * If above zero, tracker will reset after this many samples
- */
+   * If above zero, tracker will reset after this many samples.
+   *
+   * Since all intermediate values are wiped, it works best when the data source
+   * is relatively consistent, or initially-reported analysis will be quite off.
+   *
+   * Alternatively, use {@link sampleLimit} to only keep the last _n_ number
+   * of samples
+   */
   resetAfterSamples?: number;
 
   /**
    * If set, tracker will reset after this much time
    * since last `mark()` call.
+   *
+   * Like {@link resetAfterSamples}, since this wipes all the prior values, it works
+   * best when the data source is relatively consistent, otherwise it can
+   * take some samples before it reflects the true range.
    */
-  timeoutInterval?: Interval
+  timeoutInterval?: Interval;
   /**
    * If above zero, there will be a limit to intermediate values kept.
+   *
+   * This way the calculations only use the most recent _n_ number of samples.
+   *
+   * Alternatively use {@link resetAfterSamples} to wipe all the intermediate values,
+   * starting from scratch or {@link timeoutInterval} which works similarly, but based
+   * on a timeout.
    *
    * When the seen values is twice `sampleLimit`, the stored values will be trimmed down
    * to `sampleLimit`. We only do this when the values are double the size so that
    * the collections do not need to be trimmed repeatedly whilst we are at the limit.
    *
-   * Automatically implies storeIntermediate
+   * Automatically implies `storeIntermediate`.
    */
   sampleLimit?: number;
-}>
+}>;
 
 /**
- * Tracks the rate of events.
- * It's also able to compute the min,max and average interval between events.
- * 
+ * Tracks the rate of events: eg, how many times an event happens per second.
+ *
+ * It's also able to compute the min, max and average interval between events.
+ *
  * @example
  * ```js
- * const clicks = Trackers.rate();
- * 
+ * // Initialise it once
+ * const clicks = Trackers.rate(); // or: const clicks = new Trackers.RateTracker();
+ *
  * // Mark when a click happens
  * document.addEventListener(`click`, () => clicks.mark());
- * 
- * // Get details
+ *
+ * // Compute rate (returned as a number)
  * clicks.perSecond; // How many clicks per second
  * clicks.perMinute; // How many clicks per minute
  * ```
- * 
- * `timeoutInterval` is a useful option to make the tracker reset
- * after some period without `mark()` being called.
- * 
- * Another useful option is `sampleLimit`, which sets an upper bound
- * for how many events to track. A smaller value means the results
- * will more accurately track, but it might be less smooth.
- * 
+ *
+ * By default the tracker keeps averaging over _all_ the data it sees.
+ * It can be useful to limit it so more accurately tracks changes in frequency.
+ *
+ * To do so, pass in options when creating it:
+ *
  * ```js
- * // Eg reset tracker after 5 seconds of inactivity
- * const clicks = Trackers.rate({ 
+ * // Eg reset tracker after 5 seconds of inactivity,
+ * // and only keep up to 10 samples max.
+ * const clicks = Trackers.rate({
  *  sampleLimit: 10,
  *  timeoutInterval: { secs: 5 }
  * });
  * ```
+ *
+ * - `timeoutInterval` is a makes the tracker reset
+ * after some period without `mark()` being called.
+ * - `sampleLimit` sets an upper bound
+ * for how many of the most recent events should we consider.
+ * A smaller value means the analysis will be more responsive to
+ * changes in data source, at the cost of jitter. A larger value
+ * gets a smoother response, at the cost of responsiveness.
+ *
+ * The way it works under-the-hood is we store the timestamp each time `mark()`
+ * is called, and use this as the basis for computation.
  */
 export class RateTracker {
-  #events: number[] = []
+  #events: number[] = [];
   #fromTime;
   #resetAfterSamples;
   #sampleLimit;
   #resetTimer: Timeout | undefined;
 
+  /**
+   * Creates a new rate tracker.
+   *
+   * By default it does not reset.
+   * @param opts Options
+   */
   constructor(opts: Partial<RateTrackerOpts> = {}) {
     this.#resetAfterSamples = opts.resetAfterSamples ?? Number.MAX_SAFE_INTEGER;
     this.#sampleLimit = opts.sampleLimit ?? Number.MAX_SAFE_INTEGER;
@@ -81,7 +119,7 @@ export class RateTracker {
       this.reset();
     } else if (this.#events.length >= this.#sampleLimit) {
       this.#events = this.#events.slice(1);
-      this.#fromTime = this.#events[ 0 ];
+      this.#fromTime = this.#events[0];
     }
     this.#events.push(performance.now());
     if (this.#resetTimer) {
@@ -90,8 +128,10 @@ export class RateTracker {
   }
 
   /**
-   * Compute {min,max,avg} for the interval _between_ events.
-   * @returns 
+   * Computes the average time _between_ events, as well
+   * as the longest and shortest time seen.
+   *
+   * @returns Analysis in the form of `{ min, max, avg }`
    */
   computeIntervals(): {
     min: number;
@@ -117,8 +157,10 @@ export class RateTracker {
     }
     const avg = intervals.length > 0 ? total / intervals.length : 0;
     return {
-      min, max, avg
-    }
+      min,
+      max,
+      avg,
+    };
   }
 
   /**
@@ -131,7 +173,7 @@ export class RateTracker {
   }
 
   /**
-   * Resets the tracker.
+   * Resets the tracker's stored values.
    */
   reset(): void {
     this.#events = [];
@@ -139,23 +181,23 @@ export class RateTracker {
   }
 
   /**
-   * Get the number of events per second
+   * Computes the rate of events in terms of events/second
    */
   get perSecond(): number {
-    return this.#events.length / (this.elapsed / 1000)
+    return this.#events.length / (this.elapsed / 1000);
   }
 
   /**
-   * Get the number of events per minute
+   * Computes the rate of events in terms of events/minute
    */
   get perMinute(): number {
-    return this.#events.length / (this.elapsed / 1000 / 60)
+    return this.#events.length / (this.elapsed / 1000 / 60);
   }
 }
 
 /**
- * @inheritdoc RateTracker
- * @param opts 
- * @returns 
+ * @inheritdoc
+ * @param opts
+ * @returns
  */
 export const rate = (opts: Partial<RateTrackerOpts> = {}): RateTracker => new RateTracker(opts);

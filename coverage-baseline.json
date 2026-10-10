@@ -1,0 +1,84 @@
+{
+  "total": {
+    "stmts": 59.35,
+    "branch": 56.24
+  },
+  "packages": {
+    "arrays": {
+      "stmts": 93.26,
+      "branch": 88.46
+    },
+    "collections": {
+      "stmts": 76.94,
+      "branch": 67.54
+    },
+    "core": {
+      "stmts": 79.24,
+      "branch": 78.3
+    },
+    "debug": {
+      "stmts": 27.14,
+      "branch": 26.53
+    },
+    "dom": {
+      "stmts": 12.51,
+      "branch": 7.46
+    },
+    "events": {
+      "stmts": 60,
+      "branch": 50
+    },
+    "flow": {
+      "stmts": 77.58,
+      "branch": 72.31
+    },
+    "geometry": {
+      "stmts": 72.55,
+      "branch": 67.73
+    },
+    "guards": {
+      "stmts": 91.08,
+      "branch": 89.71
+    },
+    "io": {
+      "stmts": 2.4,
+      "branch": 0.95
+    },
+    "iterables": {
+      "stmts": 78.27,
+      "branch": 69.06
+    },
+    "modulation": {
+      "stmts": 63.76,
+      "branch": 55.33
+    },
+    "numbers": {
+      "stmts": 88.58,
+      "branch": 82.96
+    },
+    "process": {
+      "stmts": 91.26,
+      "branch": 75.38
+    },
+    "random": {
+      "stmts": 37.41,
+      "branch": 46.18
+    },
+    "rx": {
+      "stmts": 77.33,
+      "branch": 70.73
+    },
+    "trackers": {
+      "stmts": 80.42,
+      "branch": 73.54
+    },
+    "ui": {
+      "stmts": 0,
+      "branch": 0
+    },
+    "visual": {
+      "stmts": 23.14,
+      "branch": 31.71
+    }
+  }
+}

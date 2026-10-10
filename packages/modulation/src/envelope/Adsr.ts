@@ -1,7 +1,7 @@
 import { Paths, Beziers } from '@ixfx/geometry';
 import { scale } from '@ixfx/numbers';
 import { AdsrBase } from './AdsrBase.js';
-import type { EnvelopeOpts } from './Types.js';
+import type { EnvelopeOpts } from './types.js';
 
 export const defaultAdsrOpts = {
   attackBend: -1,

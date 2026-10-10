@@ -1,9 +1,9 @@
 import { Adsr } from './envelope/Adsr.js';
-import type { AdsrIterableOpts, EnvelopeOpts } from './envelope/Types.js';
+import type { AdsrIterableOpts, EnvelopeOpts } from './envelope/types.js';
 import { resolveWithFallbackSync } from '@ixfx/core';
 import { repeat } from '@ixfx/flow';
 
-export * from './envelope/Types.js';
+export * from './envelope/types.js';
 export * from './envelope/Adsr.js';
 export * from './envelope/AdsrBase.js';
 

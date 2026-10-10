@@ -7,8 +7,6 @@ import { get as getEasing } from '../easing.js';
 /**
  * Interpolate a string. Returns a function with amount baked-in.
  * @param amount Interpolation amount, 0-1
- * @param a Start string
- * @param b End string
  * @param options Options
  */
 export function interpolateString(amount: number, options?: Partial<StringInterpolateOptions>): (a: string, b: string) => string;

@@ -1,15 +1,15 @@
-import { describe, test, expect } from 'vitest';
-import { chunk } from '../../src/ops/chunk.js';
-import { manual } from '../../src/index.js';
 import { sleep } from '@ixfx/core';
+import { describe, expect, it, vi } from 'vitest';
+import { manual } from '../../src/index.js';
+import { chunk } from '../../src/ops/chunk.js';
 
-describe('rx/ops/chunk', () => {
-  test('chunks by quantity', async () => {
+describe(`rx/ops/chunk`, () => {
+  it(`chunks by quantity`, async () => {
     const source = manual<number>();
     const chunks: number[][] = [];
 
     const chunked = chunk(source, { quantity: 3 });
-    chunked.onValue((v) => chunks.push(v));
+    chunked.onValue(v => chunks.push(v));
 
     source.set(1);
     source.set(2);
@@ -31,12 +31,12 @@ describe('rx/ops/chunk', () => {
     expect(chunks).toEqual([[1, 2, 3], [4, 5, 6]]);
   });
 
-  test('returns remainder on stop by default', async () => {
+  it(`returns remainder on stop by default`, async () => {
     const source = manual<number>();
     const chunks: number[][] = [];
 
     const chunked = chunk(source, { quantity: 3 });
-    chunked.onValue((v) => chunks.push(v));
+    chunked.onValue(v => chunks.push(v));
 
     source.set(1);
     source.set(2);
@@ -44,78 +44,82 @@ describe('rx/ops/chunk', () => {
 
     expect(chunks).toEqual([]);
 
-    source.dispose('testing');
+    source.dispose(`testing`);
     await sleep(10);
     expect(chunks).toEqual([[1, 2]]);
   });
 
-  test('does not return remainder when returnRemainder is false', async () => {
+  it(`does not return remainder when returnRemainder is false`, async () => {
     const source = manual<number>();
     const chunks: number[][] = [];
 
     const chunked = chunk(source, { quantity: 3, returnRemainder: false });
-    chunked.onValue((v) => chunks.push(v));
+    chunked.onValue(v => chunks.push(v));
 
     source.set(1);
     source.set(2);
-    source.dispose('testing');
+    source.dispose(`testing`);
     await sleep(10);
     expect(chunks).toEqual([]);
   });
 
-  test('handles empty source', async () => {
+  it(`handles empty source`, async () => {
     const source = manual<number>();
     const chunks: number[][] = [];
 
     const chunked = chunk(source, { quantity: 3 });
-    chunked.onValue((v) => chunks.push(v));
+    chunked.onValue(v => chunks.push(v));
 
-    source.dispose('testing');
+    source.dispose(`testing`);
     await sleep(10);
     expect(chunks).toEqual([]);
   });
 
-  test('chunks arrays as source', async () => {
+  it(`chunks arrays as source`, async () => {
     const source = [1, 2, 3, 4, 5, 6, 7];
     const chunked = chunk(source, { quantity: 3 });
 
     const chunks: number[][] = [];
-    chunked.onValue((v) => chunks.push(v));
-    await sleep(50);
+    chunked.onValue(v => chunks.push(v));
 
-    expect(chunks.length).toBe(3);
+    // Array source emits over several ticks; wait for completion rather
+    // than a fixed sleep, which is sensitive to machine load
+    await vi.waitFor(() => {
+      expect(chunks.length).toBe(3);
+    });
+
     expect(chunks[0]).toEqual([1, 2, 3]);
     expect(chunks[1]).toEqual([4, 5, 6]);
     expect(chunks[2]).toEqual([7]);
   });
 
-  test('preserves value order within chunks', async () => {
+  it(`preserves value order within chunks`, async () => {
     const source = manual<string>();
     const chunks: string[][] = [];
 
     const chunked = chunk(source, { quantity: 2 });
-    chunked.onValue((v) => chunks.push(v));
+    chunked.onValue(v => chunks.push(v));
 
-    source.set('a');
-    source.set('b');
+    source.set(`a`);
+    source.set(`b`);
     await sleep(10);
-    expect(chunks).toEqual([['a', 'b']]);
+    expect(chunks).toEqual([[`a`, `b`]]);
 
-    source.set('c');
-    source.set('d');
+    source.set(`c`);
+    source.set(`d`);
     await sleep(10);
     expect(chunks).toEqual([
-      ['a', 'b'],
-      ['c', 'd'],
+      [`a`, `b`],
+      [`c`, `d`],
     ]);
   });
 
-  test('handles single item quantity', async () => {
+  it(`handles single item quantity`, async () => {
     const source = manual<number>();
     const chunks: number[][] = [];
 
     const chunked = chunk(source, { quantity: 1 });
-    chunked.onValue((v) => chunks.push(v));
+    chunked.onValue(v => chunks.push(v));
 
     source.set(1);
     await sleep(10);
@@ -130,12 +134,12 @@ describe('rx/ops/chunk', () => {
     expect(chunks).toEqual([[1], [2], [3]]);
   });
 
-  test('handles chunking objects', async () => {
+  it(`handles chunking objects`, async () => {
     const source = manual<{ id: number }>();
     const chunks: Array<Array<{ id: number }>> = [];
 
     const chunked = chunk(source, { quantity: 2 });
-    chunked.onValue((v) => chunks.push(v));
+    chunked.onValue(v => chunks.push(v));
 
     source.set({ id: 1 });
     source.set({ id: 2 });

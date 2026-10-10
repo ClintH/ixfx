@@ -1,5 +1,5 @@
-import { Reactive } from "@ixfx/rx";
-import { observable } from "@ixfx/rx/from/observable";
+import type { Reactive } from "@ixfx/rx";
+import { observable } from "@ixfx/rx/from";
 
 /**
  * Observe when a class changes on a target element, by default the document.
@@ -12,20 +12,20 @@ import { observable } from "@ixfx/rx/from/observable";
  * });
  * ```
  */
-export const cssClassChange = (target: HTMLElement = document.documentElement): Reactive<MutationRecord[]> => {
-  const m = observable<MutationRecord[]>(stream => {
+export function cssClassChange(target: HTMLElement = document.documentElement): Reactive<MutationRecord[]> {
+  const m = observable<MutationRecord[]>((stream) => {
     const ro = new MutationObserver((entries) => {
       stream.set(entries);
     });
     const opts: MutationObserverInit = {
-      attributeFilter: [ `class` ],
+      attributeFilter: [`class`],
       attributes: true,
     };
     ro.observe(target, opts);
 
     return () => {
       ro.disconnect();
-    }
+    };
   });
   return m;
 }

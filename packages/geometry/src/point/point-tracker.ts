@@ -1,24 +1,18 @@
-import {
-  TrackedValueMap,
-  type TrackedValueOpts as TrackOpts,
-  type TimestampedObject,
-} from '@ixfx/trackers';
-import { ObjectTracker } from '@ixfx/trackers';
+import type { TimestampedObject, TrackedValueOpts as TrackOpts, TrimReason } from '@ixfx/trackers';
+import type { Line, PolyLine } from '../line/line-type.js';
+import type { Coord as PolarCoord } from '../polar/index.js';
+import type { PointRelation, PointRelationResult } from './point-relation-types.js';
+import type { Point, Point3d } from './point-type.js';
+import { ObjectTracker, TrackedValueMap } from '@ixfx/trackers';
+import { Empty as LinesEmpty } from '../line/index.js';
+import { joinPointsToLines } from '../line/join-points-to-lines.js';
 import { length as LineLength } from '../line/length.js';
 import * as Vectors from '../vector.js';
-import { Empty as LinesEmpty } from '../line/index.js';
-import type { Coord as PolarCoord } from '../polar/index.js';
-import type { Line, PolyLine } from '../line/line-type.js';
-import type { Point, Point3d } from './point-type.js';
-import type { PointRelation } from './point-relation-types.js';
-import { joinPointsToLines } from '../line/join-points-to-lines.js';
-import type { TrimReason } from '@ixfx/trackers';
-import type { PointRelationResult } from "./point-relation-types.js";
-import { relation } from './relation.js';
-import { distance, distance2d } from './distance.js';
-import { subtract } from './subtract.js';
 import { angleRadian } from './angle.js';
+import { distance, distance2d } from './distance.js';
 import { Placeholder as PointsPlaceholder } from './point-type.js';
+import { relation } from './relation.js';
+import { subtract } from './subtract.js';
 /**
  * Information about seen points
  */
@@ -42,25 +36,23 @@ export type PointTrackerResults = Readonly<{
   /**
    * Relation of last point to a 'mark' point,
    * which is manually set.
-   * 
+   *
    * Will give _undefined_ if `.mark()` has not been called on tracker.
    */
   fromMark: PointTrack | undefined;
   values: readonly Point[];
 }>;
 
-
-
 /**
  * A tracked point. Mutable. Useful for monitoring how
  * it changes over time. Eg. when a pointerdown event happens, to record the start position and then
  * track the pointer as it moves until pointerup.
  *
- * See also
- * * [Playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
- * * {@link PointsTracker}: Track several points, useful for multi-touch.
- * * [ixfx Guide to Point Tracker](https://ixfx.fun/geometry/tracking/)
- * 
+ * See also:
+ * - [Playground](https://clinth.github.io/ixfx-play/data/point-tracker/index.html)
+ * - {@link PointsTracker}: Track several points, useful for multi-touch.
+ * - [ixfx Guide to Point Tracker](https://ixfx.fun/geometry/points/tracking/)
+ *
  * ```js
  * // Create a tracker on a pointerdown
  * const t = new PointTracker();
@@ -122,7 +114,7 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
 
   /**
    * Notification that buffer has been knocked down to `sampleLimit`.
-   * 
+   *
    * This will reset the `initialRelation`, which will use the new oldest value.
    */
   onTrimmed(_reason: TrimReason): void {
@@ -137,10 +129,8 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
     super.onReset();
     this.lastResult = undefined;
     this.initialRelation = undefined;
-    this.markRelation = undefined
+    this.markRelation = undefined;
   }
-
-
 
   /**
    * Makes a 'mark' in the tracker, allowing you to compare values
@@ -153,11 +143,11 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
   /**
    * Tracks a point, returning data on its relation to the
    * initial point and the last received point.
-   * 
+   *
    * @param _p Point
    */
   computeResults(
-    _p: TimestampedObject<Point>[]
+    _p: Array<TimestampedObject<Point>>,
   ): PointTrackerResults {
     const currentLast = this.last;
     const previousLast = this.values.at(-2);
@@ -191,7 +181,7 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
       fromInitial: initialRel,
       fromLast: lastRel,
       fromMark: markRel,
-      values: [ ...this.values ],
+      values: [...this.values],
     };
     this.lastResult = r;
     return r;
@@ -202,7 +192,8 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
    * Returns an empty array if points were not saved, or there's only one.
    */
   get line(): PolyLine {
-    if (this.values.length === 1) return [];
+    if (this.values.length === 1)
+      return [];
     return joinPointsToLines(...this.values);
   }
 
@@ -229,7 +220,8 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
    */
   get lineStartEnd(): Line {
     const initial = this.initial;
-    if (this.values.length < 2 || !initial) return LinesEmpty;
+    if (this.values.length < 2 || !initial)
+      return LinesEmpty;
     return {
       a: initial,
       b: this.last,
@@ -247,29 +239,32 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
    */
   distanceFromStart(force2d = false): number {
     const initial = this.initial;
-    return this.values.length >= 2 && initial !== undefined ?
-      force2d ? distance2d(initial, this.last) : distance(initial, this.last)
+    return this.values.length >= 2 && initial !== undefined
+      ? force2d ? distance2d(initial, this.last) : distance(initial, this.last)
       : 0;
   }
 
   /**
    * Returns the speed (over milliseconds) based on accumulated travel distance.
-   * 
+   *
    * If there's no initial point, 0 is returned.
    * @param force2d If _true_, speed is calculated with x,y only
-   * @returns 
+   * @returns
    */
   speedFromStart(force2d = false): number {
     const d = this.lengthTotal(force2d);
     const t = this.timespan;
-    if (Number.isNaN(t)) return 0;
-    if (d === 0) return 0;
+    if (Number.isNaN(t))
+      return 0;
+    if (d === 0)
+      return 0;
     return Math.abs(d) / t;
   }
 
   speedFromLast(force2d = false): number {
     const l = this.lastResult;
-    if (!l) return 0;
+    if (!l)
+      return 0;
     return l.fromLast.speed;
   }
 
@@ -299,12 +294,13 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
   /**
    * Returns the total distance from accumulated points.
    * Returns 0 if points were not saved, or there's only one.
-   * 
+   *
    * Use {@link lengthAverage} to get the average length for all segments
    * @param force2d If _true_ length is calculated using x&y only
    */
   lengthTotal(force2d = false): number {
-    if (this.values.length === 1) return 0;
+    if (this.values.length === 1)
+      return 0;
     const l = this.line;
     return LineLength(l, force2d);
   }
@@ -312,16 +308,16 @@ export class PointTracker<TPoint extends Point = Point> extends ObjectTracker<TP
   /**
    * Adds up the accumulated length of all points (using {@link lengthTotal})
    * dividing by the total number of points.
-   * @param force2d 
-   * @returns 
+   * @param force2d
+   * @returns
    */
   lengthAverage(force2d = false): number {
     return this.lengthTotal(force2d) / this.values.length;
   }
 
   /**
- * Returns the last x coord
- */
+   * Returns the last x coord
+   */
   get x(): number {
     return this.last.x;
   }
@@ -350,10 +346,10 @@ export class PointsTracker<TPoint extends Point = Point> extends TrackedValueMap
   PointTracker<TPoint>,
   PointTrackerResults
 > {
-
   constructor(opts: TrackOpts = {}) {
     super((key, start) => {
-      if (start === undefined) throw new Error(`Requires start point`);
+      if (start === undefined)
+        throw new Error(`Requires start point`);
       const p = new PointTracker<TPoint>({
         ...opts,
         id: key,
@@ -365,7 +361,7 @@ export class PointsTracker<TPoint extends Point = Point> extends TrackedValueMap
 
   get(id: string) {
     const v = super.get(id);
-    return v as PointTracker<TPoint> | undefined
+    return v as PointTracker<TPoint> | undefined;
   }
 }
 
@@ -373,8 +369,8 @@ export class UserPointerTracker extends PointTracker {
   /**
    * Adds a PointerEvent along with its
    * coalesced events, if available.
-   * @param p 
-   * @returns 
+   * @param p
+   * @returns
    */
   seenEvent(p: PointerEvent | MouseEvent): PointTrackerResults {
     if (`getCoalescedEvents` in p) {
@@ -392,10 +388,10 @@ export class UserPointersTracker extends TrackedValueMap<
   PointTracker,
   PointTrackerResults
 > {
-
   constructor(opts: TrackOpts = {}) {
     super((key, start) => {
-      if (start === undefined) throw new Error(`Requires start point`);
+      if (start === undefined)
+        throw new Error(`Requires start point`);
       const p = new UserPointerTracker({
         ...opts,
         id: key,
@@ -407,19 +403,20 @@ export class UserPointersTracker extends TrackedValueMap<
 
   get(id: string) {
     const v = super.get(id);
-    return v as UserPointerTracker | undefined
+    return v as UserPointerTracker | undefined;
   }
+
   /**
- * Track a PointerEvent
- * @param event
- */
+   * Track a PointerEvent
+   * @param event
+   */
   seenEvent(event: PointerEvent): Promise<PointTrackerResults[]> {
     if (`getCoalescedEvents` in event) {
       const events = event.getCoalescedEvents();
       const seens = events.map(subEvent => super.seen(subEvent.pointerId.toString(), subEvent));
       return Promise.all(seens);
     } else {
-      return Promise.all([ super.seen((event as PointerEvent).pointerId.toString(), event) ]);
+      return Promise.all([super.seen((event as PointerEvent).pointerId.toString(), event)]);
     }
   }
 }

@@ -1,40 +1,33 @@
-import { test, expect } from 'vitest';
+import { expect, it } from 'vitest';
 import * as Flow from "../src/index.js";
-import * as Elapsed from "@ixfx/core/elapsed";
-import { isApprox } from '@ixfx/numbers';
 
-test(`wait-for-value`, async () => {
+it(`wait-for-value`, async () => {
   const q1 = new Flow.WaitForValue<string>();
 
-  let since = Elapsed.elapsedSince();
   let readValue = ``;
-  let readTime = 0;
-  setTimeout(async () => {
+  const reader = setTimeout(async () => {
     readValue = await q1.get();
-    readTime = since();
   }, 50);
 
   setTimeout(() => {
     q1.add(`hello`);
-  }, 200)
+  }, 200);
 
-  await Flow.sleep(210);
-  expect(isApprox(0.1, 200, readTime)).toBe(true);
+  // Well before the add timer: reader is waiting, value not yet available
+  await Flow.sleep(120);
+  expect(q1.isUsed).toBe(false);
+
+  // Well after the add timer: reader has been resolved
+  await Flow.sleep(100);
+  expect(q1.isUsed).toBe(true);
   expect(readValue).toBe(`hello`);
+  clearTimeout(reader);
 
-  // Reusing
-  since = Elapsed.elapsedSince();
-  readTime = 0;
-  readValue = ``;
-  setTimeout(async () => {
-    readValue = await q1.get();
-    readTime = since();
-  }, 10);
-
-  expect(() => { q1.add(`there`); }).toThrow();
-
-  await Flow.sleep(15);
-  expect(readValue).toBe(`hello`); // Expect initial value still
-  expect(isApprox(0.25, 10, readTime)).toBe(true);
-
+  // Reusing the same instance: get() returns the already-resolved value
+  // immediately, and a second add throws (first-write-wins)
+  expect(await q1.get()).toBe(`hello`);
+  expect(() => {
+    q1.add(`there`);
+  }).toThrow();
+  expect(q1.isUsed).toBe(true);
 });

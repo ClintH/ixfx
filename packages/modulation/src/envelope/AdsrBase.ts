@@ -1,6 +1,6 @@
 import { SimpleEventEmitter } from '@ixfx/events';
 import { elapsedMillisecondsAbsolute, type Timer, type TimerSource } from '@ixfx/flow';
-import { adsrStateTransitions, type AdsrEvents, type AdsrStateTransitions, type AdsrTimingOpts } from './Types.js';
+import { adsrStateTransitions, type AdsrEvents, type AdsrStateTransitions, type AdsrTimingOpts } from './types.js';
 import { StateMachineWithEvents } from '@ixfx/flow/state-machine';
 
 export const defaultAdsrTimingOpts = {

@@ -1,7 +1,5 @@
-import type { StepArrayContext, StepContext, StepOptions } from '../src/traverse.js';
+import type { StepContext, StepOptions } from '../src/traverse.js';
 import { describe, expect, it } from "vitest";
-import { compareTo } from '../src/compare-to.js';
-import { FrequencyByGroup } from '../src/frequency.js';
 import { arrayIndexStepper, step } from '../src/traverse.js';
 import { takeFromGenerator } from '../src/until.js';
 
@@ -67,7 +65,35 @@ describe(`arrayIndexStepper`, () => {
     expect(takeFromGenerator(g2(), 10)).toStrictEqual([4, 3, 4, 3, 4, 3, 4, 3, 4, 3]);
   });
 
-  it (`random-step`, () => {
+  it (`random-step-deterministic`, () => {
+    const data = `a b c d e f g h i j k l m n o p q r s t u v w x y z`.split(` `);
+
+    // Cyclic source of 'random' values. Each step consumes two values:
+    // one for the chance check (always <= 1) and one for the step length,
+    // computed as floor(v * 3) + 1. With values 0.1, 0.5, 0.9 the pairing
+    // (check, length) yields step lengths that cycle 2, 1, 3.
+    const values = [0.1, 0.5, 0.9];
+    let pointer = 0;
+    const randomSource = () => {
+      const v = values[pointer % values.length];
+      pointer++;
+      return v;
+    };
+
+    const g1 = arrayIndexStepper({
+      steps: 1,
+      forward: true,
+      loop: `pingpong`,
+      randomDirectionFlip: 0,
+      randomChanceSteps: 1,
+      randomStepsMax: 3,
+      repeatLoopedIndex: false,
+    }, { data, randomSource });
+
+    expect(takeFromGenerator(g1(), 10)).toStrictEqual([0, 2, 3, 6, 8, 9, 12, 14, 15, 18]);
+  });
+
+  it (`random-step-range`, () => {
     const data = `a b c d e f g h i j k l m n o p q r s t u v w x y z`.split(` `);
 
     const g1 = arrayIndexStepper({
@@ -80,14 +106,19 @@ describe(`arrayIndexStepper`, () => {
       repeatLoopedIndex: false,
     }, { data });
 
-    const r1 = takeFromGenerator(g1(), 10);
-    const r1Steps = [...compareTo(r1, 1, (a, b) => b - a)];
-    // Since 'randomStepsMax' is 3, shouldn't expect any step length longer than that.
-    expect(r1Steps.some(v => v > 3)).toBeFalsy();
-    expect(r1Steps.some(v => v < 0)).toBeFalsy();
-    expect(r1Steps.includes(1)).toBeTruthy();
-    expect(r1Steps.includes(2)).toBeTruthy();
-    expect(r1Steps.includes(3)).toBeTruthy();
+    // Statistical test using default random source: assert invariants rather
+    // than specific values. Hops must not exceed 'randomStepsMax'. A hop of
+    // zero is possible: a bounce off the start/end index can land on the
+    // same index (eg. 24 +2 → 26 → reflected back to 24).
+    const indices = takeFromGenerator(g1(), 100);
+    for (const index of indices) {
+      expect(index).toBeGreaterThanOrEqual(0);
+      expect(index).toBeLessThanOrEqual(data.length - 1);
+    }
+    const hops = indices.slice(1).map((v, i) => Math.abs(v - indices[i]));
+    for (const hop of hops) {
+      expect(hop).toBeLessThanOrEqual(3);
+    }
   });
 });
 

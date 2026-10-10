@@ -13,22 +13,42 @@ function collect(count: number, fn: () => number): number[] {
 }
 
 it(`random`, () => {
-  // Return min
-  for (let i = 0; i < 100; i++) {
-    expect(R.randomChanceInteger(0, 20, 10)).toBe(10);
-  }
-  // Return max
-  for (let i = 0; i < 100; i++) {
-    expect(R.randomChanceInteger(1.1, 20, 10)).toBe(20);
-  }
+  // chance <= 0 returns min, chance > 1 returns max. Neither consumes the
+  // random source - asserted by passing a source that throws if called.
+  const never = () => {
+    throw new Error(`Random source should not be called`);
+  };
+  expect(R.randomChanceInteger(0, 20, 10, never)).toBe(10);
+  expect(R.randomChanceInteger(1.1, 20, 10, never)).toBe(20);
 
-  // 50% chance of using a random number
-  const resultsGrouped1 = FrequencyByGroup.fromArray(collect(100, () => R.randomChanceInteger(0.5, 20, 10)));
-  expect(resultsGrouped1.getRelative(`10`)).toBeGreaterThan(0.45);
+  // Deterministic: inject a cyclic source. First value is the chance check;
+  // if it passes, a second value picks the integer: floor(v * 11) + 10.
+  const values = [0.05, 0.99, 0.95, 0.5, 0.5, 0.0];
+  let pointer = 0;
+  const source = () => {
+    const v = values[pointer % values.length];
+    pointer++;
+    return v;
+  };
+  // 0.05 <= 0.5 → floor(0.99 * 11) + 10 = 20
+  expect(R.randomChanceInteger(0.5, 20, 10, source)).toBe(20);
+  // 0.95 > 0.5 → min (no second value consumed)
+  expect(R.randomChanceInteger(0.5, 20, 10, source)).toBe(10);
+  // 0.5 <= 0.5 → floor(0.5 * 11) + 10 = 15
+  expect(R.randomChanceInteger(0.5, 20, 10, source)).toBe(15);
+  // 0.0 <= 0.5 → floor(0.05 * 11) + 10 = 10 (wraps to first value)
+  expect(R.randomChanceInteger(0.5, 20, 10, source)).toBe(10);
 
-  // 10% chance of using a random number
-  const resultsGrouped2 = FrequencyByGroup.fromArray(collect(100, () => R.randomChanceInteger(0.1, 20, 10)));
-  expect(resultsGrouped2.getRelative(`10`)).toBeGreaterThanOrEqual(0.88);
+  // Statistical checks with default source. Expected relative frequency of
+  // `min` is ~0.545 and ~0.909 respectively. Bounds sit ~4-5 standard
+  // deviations below expected (n = 1000), loose enough to be deterministic
+  // in practice while still catching gross errors.
+  const N = 1000;
+  const resultsGrouped1 = FrequencyByGroup.fromArray(collect(N, () => R.randomChanceInteger(0.5, 20, 10)));
+  expect(resultsGrouped1.getRelative(`10`)).toBeGreaterThanOrEqual(0.47);
+
+  const resultsGrouped2 = FrequencyByGroup.fromArray(collect(N, () => R.randomChanceInteger(0.1, 20, 10)));
+  expect(resultsGrouped2.getRelative(`10`)).toBeGreaterThanOrEqual(0.86);
 });
 
 it(`is-equal`, () => {

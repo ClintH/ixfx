@@ -1,47 +1,32 @@
-import path from 'node:path'
-import process, { execArgv } from 'node:process'
+import path from 'node:path';
 
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
     alias: {
-      '#macros': path.resolve(__dirname, 'macros/index.ts'),
+      '#macros': path.resolve(__dirname, `macros/index.ts`),
     },
-    conditions: [ 'dev' ],
+    conditions: [`dev`],
   },
   environments: {
     ssr: {
-      resolve: { conditions: [ 'dev' ] },
+      resolve: { conditions: [`dev`] },
     },
   },
-   test: {
+  test: {
     include: [
-      './packages/**/tests/**/*.test.ts'
+      `./packages/**/tests/**/*.test.ts`,
     ],
-    dangerouslyIgnoreUnhandledErrors:true,
-    environment: 'happy-dom',
+    environment: `happy-dom`,
     coverage: {
-      exclude:['**/tests/**', '**/node_modules/**'],
-    }
+      // Vitest only reports files loaded by tests unless `include` is set.
+      // Without this, sources never imported by a test are invisible to the
+      // report, silently overstating coverage. Keep in sync with ratchet
+      // baseline: see scripts/coverage-ratchet.mjs and TESTING-PLAN.md
+      include: [`packages/*/src/**/*.ts`],
+      exclude: [`**/tests/**`, `**/node_modules/**`],
+      reporter: [`text`, `json-summary`],
+    },
   },
-  // test: {
-  //   reporters: process.env.GITHUB_ACTIONS ? [ 'dot', 'github-actions' ] : [ 'dot' ],
-  //   projects: [
-  //     {
-  //       test: {
-  //         name: 'default',
-  //         exclude: ['packages/dom/tests/**/*.test.ts'],
-  //       },
-  //     },
-  //     {
-  //       test: {
-  //         name: 'dom',
-  //         include: ['packages/dom/tests/**/*.test.ts'],
-  //         environment: 'happy-dom',
-  //       },
-  //     },
-  //   ],
-  // },
-  // plugins: [],
-})
+});
