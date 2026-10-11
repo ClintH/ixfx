@@ -78,6 +78,11 @@ export default antfu({
     // on non-Array receivers (Sync.concat(...) -> [...Sync]), producing
     // invalid code. Keep off unless the fixer is fixed upstream.
     'e18e/prefer-spread-syntax': `off`,
+    // Same plugin family as above; these rewrite [...x].sort() into
+    // x.toSorted(), assuming the receiver is an Array. Breaks
+    // IterableIterators (no toSorted method).
+    'e18e/prefer-array-to-sorted': `off`,
+    'unicorn/prefer-to-sorted': `off`,
     'ts/consistent-type-definitions': [
       `off`,
     ],

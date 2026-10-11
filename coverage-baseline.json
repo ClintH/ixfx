@@ -1,7 +1,7 @@
 {
   "total": {
-    "stmts": 59.55,
-    "branch": 56.44
+    "stmts": 60.96,
+    "branch": 57.97
   },
   "packages": {
     "arrays": {
@@ -9,12 +9,12 @@
       "branch": 88.46
     },
     "collections": {
-      "stmts": 76.94,
-      "branch": 67.54
+      "stmts": 78.87,
+      "branch": 68.92
     },
     "core": {
-      "stmts": 79.24,
-      "branch": 78.3
+      "stmts": 85.74,
+      "branch": 83.6
     },
     "debug": {
       "stmts": 27.14,
@@ -29,12 +29,12 @@
       "branch": 50
     },
     "flow": {
-      "stmts": 77.93,
-      "branch": 73.11
+      "stmts": 78.02,
+      "branch": 73.28
     },
     "geometry": {
-      "stmts": 72.55,
-      "branch": 67.73
+      "stmts": 72.76,
+      "branch": 67.99
     },
     "guards": {
       "stmts": 91.08,
@@ -49,12 +49,12 @@
       "branch": 71.28
     },
     "modulation": {
-      "stmts": 64.07,
-      "branch": 55.92
+      "stmts": 76.64,
+      "branch": 69.75
     },
     "numbers": {
-      "stmts": 88.58,
-      "branch": 82.96
+      "stmts": 88.82,
+      "branch": 83.33
     },
     "process": {
       "stmts": 91.26,

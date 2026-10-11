@@ -277,16 +277,14 @@ export function computeAttractionForce(attractor: ForceAffected, attractee: Forc
   const distributionRangeMax = distanceRange.max ?? 0.7;
 
   // Vector between objects
-  const f = Points.normalise(
-    Points.subtract(attractor.position, attractee.position),
-  );
+  const delta = Points.subtract(attractor.position, attractee.position);
 
-  // Distance
-  const d = clamp(Points.distance(f), distributionRangeMin, distributionRangeMax);
+  // Distance is clamped to keep the inverse-square well-behaved
+  const d = clamp(Points.distance(delta), distributionRangeMin, distributionRangeMax);
 
-  // Multiply vector by gravity, scaled by mass of things and distance
+  // Multiply unit vector by gravity, scaled by mass of things and distance
   return Points.multiplyScalar(
-    f,
+    Points.normalise(delta),
     (gravity * (attractor.mass ?? 1) * (attractee.mass ?? 1)) / (d * d),
   );
 }

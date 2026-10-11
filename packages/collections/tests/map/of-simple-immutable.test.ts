@@ -1,70 +1,79 @@
-import { expect, test, assert } from 'vitest';
-import { MapOfSimple } from '../../src/map/map-multi.js';
-import { isEqualValueDefault } from '@ixfx/core';
+import { expect, it } from 'vitest';
+import { ofSimple } from '../../src/map/map-of-simple.js';
 
-test(`MapOfSimple`, () => {
-  const m1 = new MapOfSimple<string>();
-  expect([ ...m1.keys() ].length === 0).toBe(true);
-  expect([ ...m1.entriesFlat() ].length === 0).toBe(true);
-  expect([ ...m1.valuesFlat() ].length === 0).toBe(true);
+it(`addKeyedValues and read back`, () => {
+  let m = ofSimple<string>();
+  expect(m.isEmpty).toBe(true);
 
-  let m2 = new MapOfSimple<string>();
-  m2 = m2.addKeyedValues(`name`, `jane`, `jill`, `joe`, `jack`);
-  m2 = m2.addKeyedValues(`colours`, `red`, `blue`, `yellow`);
-  expect([ ...m2.keys() ]).toStrictEqual([ 'name', 'colours' ]);
-  expect([ ...m2.valuesFor(`name`) ]).toStrictEqual([ `jane`, `jill`, `joe`, `jack` ]);
-  expect([ ...m2.valuesFor(`colours`) ]).toStrictEqual([ `red`, `blue`, `yellow` ]);
-  assert.sameDeepMembers(
+  m = m.addKeyedValues(`name`, `jane`, `jill`);
+  m = m.addKeyedValues(`colours`, `red`);
 
-    [ ...m2.entriesFlat() ],
-    [
-      [ `name`, `jane` ],
-      [ `name`, `jill` ],
-      [ `name`, `joe` ],
-      [ `name`, `jack` ],
-      [ `colours`, `red` ],
-      [ `colours`, `blue` ],
-      [ `colours`, `yellow` ],
-    ]
-  );
+  expect(m.isEmpty).toBe(false);
+  expect([...m.valuesFor(`name`)]).toEqual([`jane`, `jill`]);
+  expect(m.count(`name`)).toBe(2);
+  expect(m.count(`missing`)).toBe(0);
+  expect(m.has(`name`)).toBe(true);
+  expect(m.has(`missing`)).toBe(false);
+  expect([...m.keys()].sort()).toEqual([`colours`, `name`]);
+});
 
-  expect([ ...m2.valuesFor(`notfound`) ].length === 0).toBe(true);
+it(`immutability: operations return new maps, originals unchanged`, () => {
+  const original = ofSimple<string>().addKeyedValues(`a`, `1`);
 
-  m2 = m2.clear();
-  expect(m2.lengthKeys).toBe(0);
+  const added = original.addKeyedValues(`b`, `2`);
+  // Original still only has key 'a'
+  expect([...original.keys()]).toEqual([`a`]);
+  expect([...added.keys()].sort()).toEqual([`a`, `b`]);
 
-  let m3 = new MapOfSimple<string>();
-  m3 = m3.addBatch([
-    [ 'name', [ 'apple', 'carrot', 'pear' ] ],
-    [ 'colours', [ 'red', 'green', 'blue' ] ]
+  const deleted = added.delete(`a`);
+  expect([...added.keys()].sort()).toEqual([`a`, `b`]);
+  expect([...deleted.keys()]).toEqual([`b`]);
+
+  // Values under an unchanged key are not shared by reference
+  const mutatedCopy = original.addKeyedValues(`a`, `2`);
+  expect([...original.valuesFor(`a`)]).toEqual([`1`]);
+  expect([...mutatedCopy.valuesFor(`a`)]).toEqual([`1`, `2`]);
+});
+
+it(`deleteKeyValue removes single values`, () => {
+  let m = ofSimple<string>().addKeyedValues(`a`, `1`, `2`, `3`);
+  m = m.deleteKeyValue(`a`, `2`);
+  expect([...m.valuesFor(`a`)]).toEqual([`1`, `3`]);
+
+  // Deleting the last value under a key removes the key
+  m = m.deleteKeyValue(`a`, `1`).deleteKeyValue(`a`, `3`);
+  expect(m.has(`a`)).toBe(false);
+});
+
+it(`deleteByValue removes value across all keys`, () => {
+  let m = ofSimple<string>().addKeyedValues(`a`, `x`, `y`).addKeyedValues(`b`, `x`, `z`);
+  m = m.deleteByValue(`x`);
+  expect([...m.valuesFor(`a`)]).toEqual([`y`]);
+  expect([...m.valuesFor(`b`)]).toEqual([`z`]);
+});
+
+it(`clear returns an empty map without touching the original`, () => {
+  const m = ofSimple<string>().addKeyedValues(`a`, `1`);
+  const cleared = m.clear();
+  expect(cleared.isEmpty).toBe(true);
+  expect(m.isEmpty).toBe(false);
+});
+
+it(`lookups`, () => {
+  const m = ofSimple<string>().addKeyedValues(`a`, `1`, `2`).addKeyedValues(`b`, `2`, `3`);
+
+  expect(m.hasKeyValue(`a`, `1`)).toBe(true);
+  expect(m.hasKeyValue(`a`, `3`)).toBe(false);
+
+  // Same value under several keys: first key wins
+  expect(m.firstKeyByValue(`2`)).toBe(`a`);
+  expect(m.firstKeyByValue(`3`)).toBe(`b`);
+  expect(m.firstKeyByValue(`nope`)).toBeUndefined();
+
+  expect([...m.valuesFlat()].sort()).toEqual([`1`, `2`, `2`, `3`]);
+  expect([...m.entriesFlat()].length).toBe(4);
+  expect([...m.keysAndCounts()].sort((a, b) => a[0].localeCompare(b[0]))).toEqual([
+    [`a`, 2],
+    [`b`, 2],
   ]);
-  expect([ ...m3.valuesFor('name') ]).toStrictEqual([ 'apple', 'carrot', 'pear' ])
-  expect([ ...m3.valuesFor('colours') ]).toStrictEqual([ 'red', 'green', 'blue' ]);
-
-  type Person = { name: string, size: number }
-  let m4 = new MapOfSimple<Person>((v) => v.name, isEqualValueDefault);
-  m4 = m4.addValue({ name: 'jill', size: 10 }, { name: 'jill', size: 1 });
-  m4 = m4.addValue({ name: 'jane', size: 10 });
-  expect([ ...m4.valuesFor('jill') ]).toStrictEqual([ { name: 'jill', size: 10 }, { name: 'jill', size: 1 } ])
-
-  m4 = m4.deleteByValue({ name: 'jill', size: 1 });
-  expect([ ...m4.valuesFor('jill') ]).toStrictEqual([ { name: 'jill', size: 10 } ])
-
-  // Delete a value that doesn't exist
-  m4 = m4.deleteKeyValue('jill', { name: 'jill', size: 100 });
-  expect(m4.has('jill')).toBeTruthy()
-
-  // Delete a value that does exist but different key
-  m4 = m4.deleteKeyValue('jill', { name: 'jane', size: 10 });
-  expect(m4.has('jill')).toBeTruthy()
-  expect([ ...m4.valuesFor('jane') ]).toStrictEqual([ { name: 'jane', size: 10 } ])
-
-  // Delete a value that does exist under key
-  m4 = m4.deleteKeyValue('jill', { name: 'jill', size: 10 });
-  expect(m4.has('jill')).toBeFalsy();
-
-  m4 = m4.delete('jane');
-  expect(m4.has('jane')).toBeFalsy();
-
-
 });
