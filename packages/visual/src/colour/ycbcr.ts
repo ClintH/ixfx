@@ -1,5 +1,4 @@
-import type * as C from "colorizr";
-import type { ParsingOptions, Rgb, Rgb8Bit, RgbScalar, YCbCr, YCbCr8bit, YCbCrScalar } from "./types.js";
+import type { ParsingOptions, Rgb, Rgb8Bit, YCbCr, YCbCr8bit, YCbCrScalar } from "./types.js";
 import { numberInclusiveRangeTest, numberTest, resultThrow } from "@ixfx/guards";
 import { isHsl, isRgb } from "./guards.js";
 import * as SrgbSpace from './srgb.js';
@@ -52,10 +51,13 @@ export function scalar(y = 0.5, cb = 0.5, cr = 0.5, opacity = 1): YCbCrScalar {
  */
 export function fromSrgTo8bit(rgb: Rgb): YCbCr8bit {
   const { r, g, b, opacity } = SrgbSpace.to8bit(rgb);
+  // BT.601 matrix. Results are rounded and clamped to the 8-bit range:
+  // pure red yields cr = 0.5*255 + 128 = 255.5, above the legal maximum.
+  const clamp8 = (v: number): number => Math.max(0, Math.min(255, Math.round(v)));
   return eightBit(
-    (0.299 * r + 0.587 * g + 0.114 * b) + 0,
-    (-0.169 * r + -0.331 * g + 0.500 * b) + 128,
-    (0.500 * r + -0.419 * g + -0.081 * b) + 128,
+    clamp8((0.299 * r + 0.587 * g + 0.114 * b) + 0),
+    clamp8((-0.169 * r + -0.331 * g + 0.500 * b) + 128),
+    clamp8((0.500 * r + -0.419 * g + -0.081 * b) + 128),
     opacity,
   );
 }
@@ -94,7 +96,9 @@ export function to8bit(ycbcr: YCbCr): YCbCr8bit {
 
 export function fromHexString<T extends ParsingOptions<YCbCr>>(hexString: string, scalar: T): T extends { scalar: true } ? YCbCrScalar : YCbCr8bit;
 
-export function fromHexString(hexString: string, options: ParsingOptions<YCbCr> = {}): YCbCr8bit {
+// NB: the `scalar` option in the overload is not honoured by the
+// implementation; it always returns 8-bit
+export function fromHexString(hexString: string, _options: ParsingOptions<YCbCr> = {}): YCbCr8bit {
   const rgb = SrgbSpace.fromHexString(hexString, false);
   return fromSrgTo8bit(rgb);
 }

@@ -1,7 +1,7 @@
 {
   "total": {
-    "stmts": 60.96,
-    "branch": 57.97
+    "stmts": 63.13,
+    "branch": 59.59
   },
   "packages": {
     "arrays": {
@@ -33,8 +33,8 @@
       "branch": 73.28
     },
     "geometry": {
-      "stmts": 72.76,
-      "branch": 67.99
+      "stmts": 78.6,
+      "branch": 72.52
     },
     "guards": {
       "stmts": 91.08,
@@ -61,24 +61,24 @@
       "branch": 75.38
     },
     "random": {
-      "stmts": 37.41,
-      "branch": 46.18
+      "stmts": 59.22,
+      "branch": 63.27
     },
     "rx": {
-      "stmts": 77.33,
-      "branch": 70.73
+      "stmts": 80.8,
+      "branch": 72.08
     },
     "trackers": {
-      "stmts": 80.42,
-      "branch": 73.54
+      "stmts": 86.23,
+      "branch": 78.7
     },
     "ui": {
       "stmts": 0,
       "branch": 0
     },
     "visual": {
-      "stmts": 23.14,
-      "branch": 31.71
+      "stmts": 24.91,
+      "branch": 33.95
     }
   }
 }

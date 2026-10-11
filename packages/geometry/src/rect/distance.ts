@@ -25,8 +25,8 @@ export function distanceFromExterior(rect: RectPositioned, pt: Point): number {
   PointsGuard(pt, `pt`);
   if (intersectsPoint(rect, pt))
     return 0;
-  const dx = Math.max(rect.x - pt.x, 0, pt.x - rect.x + rect.width);
-  const dy = Math.max(rect.y - pt.y, 0, pt.y - rect.y + rect.height);
+  const dx = Math.max(rect.x - pt.x, 0, pt.x - (rect.x + rect.width));
+  const dy = Math.max(rect.y - pt.y, 0, pt.y - (rect.y + rect.height));
   return Math.hypot(dx, dy);
 }
 

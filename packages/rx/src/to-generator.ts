@@ -1,78 +1,49 @@
-import { resolveSource } from "./resolve-source.js";
 import type { ReactiveOrSource } from "./types.js";
+import { resolveSource } from "./resolve-source.js";
 import { messageHasValue, messageIsDoneSignal } from "./util.js";
 
 /**
- * Returns an AsyncGenerator wrapper around Reactive.
- * This allows values to be iterated over using a `for await` loop,
- * like Chains.
+ * Turns a reactive source into an async generator.
  *
- * ```js
- * // Reactive numerical value
- * const number = Reactive.number(10);
- * 
- * const g = Reactive.toGenerator(number);
- * for await (const v of g) {
- *  console.log(v); // Prints out whenever the reactive value changes
- * }
- * // Execution doesn't continue until Reactive finishes
- * ```
- * 
- * When/if `source` closes, an exception is thrown.
- * To catch this, wrap the calling `for await` in a try-catch block
- * ```js
- * try {
- *  for await (const v of g) {
- *  }
- * } catch (error) {
- * }
- * // Completed
- * ``` 
- * 
- * Use something like `setTimeout` to loop over the generator
- * without impeding the rest of your code flow. For example:
- * ```js
- * // Listen for every pointerup event
- * const ptr = Reactive.fromEvent(document.body, `pointerup`);
- * // Start iterating
- * setTimeout(async () => {
- *  const gen = Reactive.toGenerator(ptr);
- *  try {
- *    for await (const v of gen) {
- *      // Prints out whenever there is a click
- *      console.log(v);
- *    }
- *  } catch (e) { }
- *  console.log(`Iteration done`);
- * });
- * 
- * // Execution continues here immediately
- * ```
- * @param source 
+ * Values emitted while the consumer is busy are queued, so nothing is lost
+ * if several values arrive between pulls.
  */
 export async function* toGenerator<V>(source: ReactiveOrSource<V>): AsyncGenerator<V> {
   const s = resolveSource(source);
-  let promiseResolve: ((value: V | PromiseLike<V>) => void) = (_) => {/** noop */ };
-  let promiseReject: ((reason: string) => void) = (_) => {/** no-op */ }
 
-  const promiseInit = () => (new Promise<V>((resolve, reject) => {
-    promiseResolve = resolve;
-    promiseReject = reject;
-  }));
-  let promise = promiseInit();
-  let keepRunning = true;
+  const queue: V[] = [];
+  let failure: string | undefined;
+  let notify: (() => void) | undefined;
 
-  s.on(message => {
+  const wake = () => {
+    const n = notify;
+    notify = undefined;
+    n?.();
+  };
+
+  const unsub = s.on((message) => {
     if (messageHasValue(message)) {
-      promiseResolve(message.value);
-      promise = promiseInit();
+      queue.push(message.value);
+      wake();
     } else if (messageIsDoneSignal(message)) {
-      keepRunning = false;
-      promiseReject(`Source has completed`);
+      failure = `Source has completed`;
+      wake();
     }
   });
 
-  while (keepRunning) {
-    yield await promise;
+  try {
+    while (true) {
+      if (queue.length > 0) {
+        yield queue.shift() as V;
+        continue;
+      }
+      if (failure !== undefined)
+        throw new Error(failure);
+      await new Promise<void>((resolve) => {
+        notify = resolve;
+      });
+    }
+  } finally {
+    unsub();
   }
 }
