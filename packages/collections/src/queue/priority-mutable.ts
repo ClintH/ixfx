@@ -1,6 +1,5 @@
 import { numberTest, resultThrow } from "@ixfx/guards";
 import { isEqualDefault, type IsEqual } from "@ixfx/core";
-import { max as IterablesMax, min as IterablesMin, last as IterablesLast } from "@ixfx/iterables";
 import type { IPriorityQueueMutable, PriorityItem } from "./ipriority-queue-mutable.js";
 import { QueueMutable } from "./queue-mutable.js";
 import type { QueueOpts } from "./queue-types.js";
@@ -64,35 +63,41 @@ export class PriorityMutable<V> extends QueueMutable<PriorityItem<V>> implements
     this.enqueueWithPriority(item, priority);
   }
 
-  dequeueMax(): V | undefined {
-    //const m = IterablesLast(IterablesMax(this.data, v => v.priority));
-    const m = IterablesLast(IterablesMax(this.data, (a, b) => a.priority >= b.priority));
+  /**
+   * Finds the entry with the highest (`max`) or lowest (`min`) priority.
+   * Ties go to the entry enqueued first.
+   */
+  private findExtreme(which: `max` | `min`): PriorityItem<V> | undefined {
+    let best: PriorityItem<V> | undefined;
+    for (const d of this.data) {
+      if (best === undefined) best = d;
+      else if (which === `max` ? d.priority > best.priority : d.priority < best.priority) best = d;
+    }
+    return best;
+  }
 
-    if (m === undefined) return;
-    this.removeWhere(item => item === m);
-    return m.item;
+  private dequeueExtreme(which: `max` | `min`): V | undefined {
+    const entry = this.findExtreme(which);
+    if (entry === undefined) return;
+    // Remove exactly this entry (by reference), not other entries holding an equal item
+    this.removeWhere(d => d === entry);
+    return entry.item;
+  }
+
+  dequeueMax(): V | undefined {
+    return this.dequeueExtreme(`max`);
   }
 
   dequeueMin(): V | undefined {
-    const m = IterablesLast(IterablesMax(this.data, (a, b) => a.priority >= b.priority));
-    //const m = IterablesLast(IterablesMin(this.data, (a,b) => a.priority >= b.priority));
-    if (m === undefined) return;
-    this.removeWhere(item => item.item === m);
-    return m.item;
+    return this.dequeueExtreme(`min`);
   }
 
   peekMax(): V | undefined {
-    const m = IterablesLast(IterablesMax(this.data, (a, b) => a.priority >= b.priority));
-    //const m = IterablesLast(IterablesMax(this.data, v => v.priority));
-    if (m === undefined) return;
-    return m.item;
+    return this.findExtreme(`max`)?.item;
   }
 
   peekMin(): V | undefined {
-    //const m = IterablesLast<V>(IterablesMin(this.data, (a,b) => a.priority >= b.priority));
-    const m = IterablesLast(IterablesMin(this.data, (a, b) => a.priority >= b.priority));
-    if (m === undefined) return;
-    return m.item;
+    return this.findExtreme(`min`)?.item;
   }
 }
 
