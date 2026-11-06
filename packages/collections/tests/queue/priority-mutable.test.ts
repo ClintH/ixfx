@@ -98,10 +98,48 @@ describe('collections/queue/priority-mutable', () => {
       const pq = new PriorityMutable<string>();
       pq.enqueueWithPriority('item', 5);
       
-      const result = pq.dequeueMin();
-      // dequeueMin has a bug - it finds max and then removes incorrectly
-      // But it should return something if queue is not empty
-      expect(result).toBeDefined();
+      expect(pq.dequeueMin()).toBe('item');
+      expect(pq.length).toBe(0);
+    });
+
+    test('returns lowest priority item and removes it', () => {
+      const pq = new PriorityMutable<string>();
+      pq.enqueueWithPriority('x', 5);
+      pq.enqueueWithPriority('y', 1);
+      pq.enqueueWithPriority('z', 3);
+      expect(pq.dequeueMin()).toBe('y');
+      expect(pq.length).toBe(2);
+      expect(pq.dequeueMin()).toBe('z');
+      expect(pq.dequeueMin()).toBe('x');
+      expect(pq.dequeueMin()).toBeUndefined();
+    });
+
+    test('drains in ascending order', () => {
+      const pq = new PriorityMutable<number>();
+      // item is its own priority
+      for (const p of [ 4, 9, 1, 7, 3, 3, 0 ]) pq.enqueueWithPriority(p, p);
+      const drained: number[] = [];
+      while (!pq.isEmpty) drained.push(pq.dequeueMin()!);
+      expect(drained).toEqual([ 0, 1, 3, 3, 4, 7, 9 ]);
+    });
+
+    test('equal priorities dequeue in insertion order', () => {
+      const pq = new PriorityMutable<string>();
+      pq.enqueueWithPriority('first', 2);
+      pq.enqueueWithPriority('second', 2);
+      pq.enqueueWithPriority('third', 2);
+      expect(pq.dequeueMin()).toBe('first');
+      expect(pq.dequeueMax()).toBe('second');
+      expect(pq.dequeueMax()).toBe('third');
+    });
+
+    test('removes only one entry when items are equal', () => {
+      const pq = new PriorityMutable<string>();
+      pq.enqueueWithPriority('dup', 1);
+      pq.enqueueWithPriority('dup', 5);
+      expect(pq.dequeueMax()).toBe('dup');
+      expect(pq.length).toBe(1);
+      expect(pq.peekMin()).toBe('dup');
     });
 
     test('returns undefined when empty', () => {

@@ -246,40 +246,257 @@ test(`dfs`, () => {
   expect(path.length).eq(7);
 });
 
-// FIXME
 
-// test(`pathDijkstra`, () => {
-//   const g = Dg.graph(
-//     { from: `1`, to: `6`, weight: 14 },
-//     { from: `1`, to: `3`, weight: 9 },
-//     { from: `1`, to: `2`, weight: 7 },
+test(`pathDijkstra`, () => {
+  const g = Dg.graph(
+    { from: `1`, to: `6`, weight: 14 },
+    { from: `1`, to: `3`, weight: 9 },
+    { from: `1`, to: `2`, weight: 7 },
+    { from: `6`, to: `5`, weight: 9 },
+    { from: `6`, to: `3`, weight: 2 },
+    { from: `2`, to: `3`, weight: 10 },
+    { from: `2`, to: `4`, weight: 15 },
+    { from: `4`, to: `5`, weight: 6 },
+    { from: `5`, to: `7`, weight: 6 }
+  );
+  const { distances, previous, pathTo } = Dg.pathDijkstra(g, `1`);
+  expect(distances.get(`1`)).eq(0);
+  expect(distances.get(`2`)).eq(7);
+  expect(distances.get(`3`)).eq(9);
+  expect(distances.get(`6`)).eq(14);
+  expect(distances.get(`4`)).eq(22);
+  expect(distances.get(`5`)).eq(23);
+  expect(distances.get(`7`)).eq(29);
+  expect(previous.get(`5`)?.id).eq(`6`);
+  expect(previous.get(`2`)?.id).eq(`1`);
 
-//     { from: `6`, to: `5`, weight: 9 },
-//     { from: `6`, to: `3`, weight: 2 },
+  // Path is destination-first
+  expect(pathTo(`7`).map(e => e.id)).toEqual([ `7`, `5`, `6` ]);
+  expect(pathTo(`1`)).toEqual([]);
+});
 
-//     { from: `2`, to: `3`, weight: 10 },
-//     { from: `2`, to: `4`, weight: 15 },
+test(`pathDijkstra-shortcut-and-unreachable`, () => {
+  // 1->3 direct (9) is longer than 1->2->3 (8)
+  const g = Dg.graph(
+    { from: `1`, to: `3`, weight: 9 },
+    { from: `1`, to: `2`, weight: 7 },
+    { from: `2`, to: `3`, weight: 1 },
+    { from: `x`, to: `1` }
+  );
+  const { distances, pathTo } = Dg.pathDijkstra(g, `1`);
+  expect(distances.get(`3`)).eq(8);
+  expect(pathTo(`3`).map(e => e.id)).toEqual([ `3`, `2` ]);
+  // x only has an edge *into* 1, so is unreachable
+  expect(distances.get(`x`)).eq(Number.MAX_SAFE_INTEGER);
+  expect(() => pathTo(`x`)).toThrow();
+  expect(() => pathTo(`nope`)).toThrow();
+});
 
-//     { from: `4`, to: `5`, weight: 6 },
+test(`pathDijkstra-source`, () => {
+  const g = linearGraph();
+  expect(() => Dg.pathDijkstra(g, `zzz`)).toThrow();
+  const viaVertex = Dg.pathDijkstra(g, Dg.get(g, `b`)!);
+  expect(viaVertex.distances.get(`d`)).eq(2);
+  // default weight is 1
+  expect(viaVertex.distances.get(`a`)).eq(Number.MAX_SAFE_INTEGER);
+});
 
-//     { from: `5`, to: `7`, weight: 6 }
-//   );
-//   console.log(`graph made`);
-//   const { distances, previous, pathTo } = Dg.pathDijkstra(g, `1`);
-//   console.log(`path`);
+test(`bfs-cycle-visits-once`, () => {
+  expect([ ...Dg.bfs(circularGraph(), `a`) ].map(v => v.id)).toEqual([ `a`, `b`, `c`, `d` ]);
+});
 
-//   expect(distances.get(`1`)).eq(0);
-//   expect(distances.get(`6`)).eq(14);
-//   expect(distances.get(`3`)).eq(9);
-//   expect(distances.get(`2`)).eq(7);
-//   expect(distances.get(`5`)).eq(23);
-//   expect(distances.get(`4`)).eq(22);
+test(`bfs-target`, () => {
+  const g = linearGraph();
+  expect([ ...Dg.bfs(g, `a`, `c`) ].map(v => v.id)).toEqual([ `a`, `b`, `c` ]);
+  expect([ ...Dg.bfs(g, `a`, Dg.get(g, `b`)!) ].map(v => v.id)).toEqual([ `a`, `b` ]);
+  expect(() => [ ...Dg.bfs(g, `nope`) ]).toThrow();
+});
 
-//   expect(previous.get(`5`)?.id).eq(`6`);
-//   expect(previous.get(`2`)?.id).eq(`1`);
+test(`dfs-cycle-and-errors`, () => {
+  expect([ ...Dg.dfs(circularGraph(), `a`) ].map(v => v.id)).toEqual([ `a`, `b`, `c`, `d` ]);
+  expect(() => [ ...Dg.dfs(linearGraph(), `nope`) ]).toThrow();
+});
 
-//   // console.log(distances);
-//   // console.log(previous);
-//   // console.log(`---`);
-//   // console.log(pathTo(`7`));
-// });
+test(`connect-options`, () => {
+  // bidi
+  const g1 = Dg.connect(Dg.graph(), { from: `a`, to: [ `b`, `c` ], bidi: true });
+  expect(Dg.hasOut(g1, `a`, `b`)).toBe(true);
+  expect(Dg.hasOut(g1, `b`, `a`)).toBe(true);
+  expect(Dg.hasOut(g1, `c`, `a`)).toBe(true);
+  expect(Dg.hasOut(g1, `b`, `c`)).toBe(false);
+
+  // weight
+  const g2 = Dg.connect(Dg.graph(), { from: `a`, to: `b`, weight: 5 });
+  expect(Dg.get(g2, `a`)!.out[ 0 ].weight).toBe(5);
+
+  // duplicate connect does not duplicate edges
+  const g3 = Dg.connect(g2, { from: `a`, to: `b` });
+  expect(Dg.get(g3, `a`)!.out.length).toBe(1);
+});
+
+test(`connectWithEdges-and-connectTo`, () => {
+  const r = Dg.connectWithEdges(Dg.graph(), { from: `a`, to: [ `b`, `c` ], bidi: true, weight: 2 });
+  expect(r.edges.map(e => e.id)).toEqual([ `b`, `c`, `a`, `a` ]);
+  expect(r.edges.every(e => e.weight === 2)).toBe(true);
+
+  const t = Dg.connectTo(Dg.graph(), `x`, `y`, 3);
+  expect(t.edge).toEqual({ id: `y`, weight: 3 });
+  expect(Dg.hasOut(t.graph, `x`, `y`)).toBe(true);
+  expect(Dg.hasKey(t.graph, `y`)).toBe(true);
+});
+
+test(`connect-validates-params`, () => {
+  // @ts-expect-error
+  expect(() => Dg.connect(undefined, { from: `a`, to: `b` })).toThrow();
+  // @ts-expect-error
+  expect(() => Dg.connect(Dg.graph(), undefined)).toThrow();
+});
+
+test(`immutability`, () => {
+  const g1 = linearGraph();
+  const g2 = Dg.connect(g1, { from: `d`, to: `e` });
+  expect(Dg.hasKey(g1, `e`)).toBe(false);
+  expect(Dg.hasKey(g2, `e`)).toBe(true);
+  const g3 = Dg.disconnect(g2, `a`, `b`);
+  expect(Dg.hasOut(g2, `a`, `b`)).toBe(true);
+  expect(Dg.hasOut(g3, `a`, `b`)).toBe(false);
+});
+
+test(`disconnect`, () => {
+  const g = linearGraph();
+  const g2 = Dg.disconnect(g, `a`, `b`);
+  expect(Dg.hasNoOuts(g2, `a`)).toBe(true);
+  expect(Dg.hasKey(g2, `b`)).toBe(true);
+  // Disconnecting a non-existent edge returns the same graph
+  expect(Dg.disconnect(g, `a`, `c`)).toBe(g);
+  expect(() => Dg.disconnect(g, `a`, `nope`)).toThrow();
+  expect(() => Dg.disconnect(g, `nope`, `a`)).toThrow();
+});
+
+test(`getOrCreate-getOrFail`, () => {
+  const g = linearGraph();
+  const existing = Dg.getOrCreate(g, `a`);
+  expect(existing.graph).toBe(g);
+  expect(existing.vertex.id).toBe(`a`);
+
+  const created = Dg.getOrCreate(g, `z`);
+  expect(Dg.hasKey(created.graph, `z`)).toBe(true);
+  expect(Dg.hasKey(g, `z`)).toBe(false);
+
+  expect(Dg.getOrFail(g, `a`).id).toBe(`a`);
+  expect(() => Dg.getOrFail(g, `z`)).toThrow();
+});
+
+test(`createVertex-and-updateGraphVertex`, () => {
+  expect(Dg.createVertex(`q`)).toEqual({ id: `q`, out: [] });
+  const g = Dg.updateGraphVertex(linearGraph(), { id: `a`, out: [ { id: `d` } ] });
+  expect(Dg.hasOnlyOuts(g, `a`, `d`)).toBe(true);
+});
+
+test(`adjacency`, () => {
+  const g = linearGraph();
+  expect([ ...Dg.adjacentVertices(g, `a`) ].map(v => v.id)).toEqual([ `b` ]);
+  expect([ ...Dg.adjacentVertices(g, Dg.get(g, `b`)) ].map(v => v.id)).toEqual([ `c` ]);
+  expect([ ...Dg.adjacentVertices(g, undefined) ]).toEqual([]);
+  expect([ ...Dg.adjacentVertices(g, `d`) ]).toEqual([]);
+  expect(() => [ ...Dg.adjacentVertices(g, `nope`) ]).toThrow();
+
+  const a = Dg.get(g, `a`)!, b = Dg.get(g, `b`)!, c = Dg.get(g, `c`)!;
+  expect(Dg.areAdjacent(g, a, b)).toBe(true);
+  expect(Dg.areAdjacent(g, b, a)).toBe(true); // either direction
+  expect(Dg.areAdjacent(g, a, c)).toBeUndefined();
+});
+
+test(`vertexHasOut-variants`, () => {
+  const g = linearGraph();
+  const a = Dg.get(g, `a`)!;
+  expect(Dg.vertexHasOut(a, Dg.get(g, `b`)!)).toBe(true);
+  // @ts-expect-error
+  expect(Dg.vertexHasOut(undefined, `b`)).toBe(false);
+});
+
+test(`hasNoOuts-hasOut-variants`, () => {
+  const g = linearGraph();
+  expect(Dg.hasNoOuts(g, `unknown`)).toBe(false);
+  expect(Dg.hasNoOuts(g, Dg.get(g, `d`)!)).toBe(true);
+  expect(Dg.hasOut(g, Dg.get(g, `a`)!, Dg.get(g, `b`)!)).toBe(true);
+  expect(() => Dg.hasOut(g, `unknown`, `a`)).toThrow();
+  // @ts-expect-error
+  expect(() => Dg.hasOut(g, undefined, `a`)).toThrow();
+  expect(Dg.hasOnlyOuts(g, `d`)).toBe(true);
+});
+
+test(`iterators`, () => {
+  const g = linearGraph();
+  expect([ ...Dg.vertices(g) ].map(v => v.id)).toEqual([ `a`, `b`, `c`, `d` ]);
+  expect([ ...Dg.edges(g) ].map(e => e.id)).toEqual([ `b`, `c`, `d` ]);
+  expect([ ...Dg.edges(Dg.graph()) ]).toEqual([]);
+});
+
+test(`distanceDefault`, () => {
+  const g = linearGraph();
+  expect(Dg.distanceDefault(g, { id: `a`, weight: 4 })).toBe(4);
+  expect(Dg.distanceDefault(g, { id: `a` })).toBe(1);
+});
+
+test(`clone-and-graphFromVertices`, () => {
+  const g = linearGraph();
+  const c = Dg.clone(g);
+  expect(c).not.toBe(g);
+  expect(Dg.dumpGraph(c)).toBe(Dg.dumpGraph(g));
+  const f = Dg.graphFromVertices([ Dg.createVertex(`x`), { id: `y`, out: [ { id: `x` } ] } ]);
+  expect(Dg.hasOut(f, `y`, `x`)).toBe(true);
+});
+
+test(`dumpGraph-weights-and-iterable`, () => {
+  const g = Dg.graph({ from: `a`, to: `b`, weight: 3 });
+  expect(Dg.dumpGraph(g)).toBe([ ` a`, `  -> b (3)`, ` b (terminal)` ].join(`\n`));
+  expect(Dg.dumpGraph(Dg.vertices(g))).toBe(Dg.dumpGraph(g));
+});
+
+test(`graph-validation`, () => {
+  // @ts-expect-error
+  expect(() => Dg.hasKey(undefined, `a`)).toThrow(/undefined/);
+  // @ts-expect-error
+  expect(() => Dg.hasKey(null, `a`)).toThrow(/null/);
+  // @ts-expect-error
+  expect(() => Dg.hasKey({}, `a`)).toThrow(/vertices/);
+  // @ts-expect-error
+  expect(() => Dg.hasKey(5, `a`)).toThrow();
+  expect(() => Dg.get(linearGraph(), ``)).toThrow();
+});
+
+test(`topologicalSort-orders-and-rejects-cycles`, () => {
+  const g = Dg.graph(
+    { from: `c`, to: `d` },
+    { from: `a`, to: `b` },
+    { from: `b`, to: `c` }
+  );
+  const sorted = [ ...Dg.vertices(Dg.topologicalSort(g)) ].map(v => v.id);
+  expect(sorted).toEqual([ `a`, `b`, `c`, `d` ]);
+  expect(() => Dg.topologicalSort(circularGraph())).toThrow(/cycles/);
+});
+
+test(`getCycles-self-loop-and-none`, () => {
+  expect(Dg.getCycles(linearGraph())).toEqual([]);
+  expect(Dg.getCycles(Dg.graph())).toEqual([]);
+});
+
+test(`toAdjacencyMatrix-labels`, () => {
+  const m = Dg.toAdjacencyMatrix(linearGraph());
+  expect(m.row(0)).toEqual([ false, true, false, false ]);
+  expect(m.row(3)).toEqual([ false, false, false, false ]);
+});
+
+test(`transitiveReduction-no-redundancy`, () => {
+  const g = linearGraph();
+  expect(Dg.dumpGraph(Dg.transitiveReduction(g))).toBe(Dg.dumpGraph(g));
+});
+
+test(`pathDijkstra-detached-source-vertex`, () => {
+  const g = linearGraph();
+  const { distances } = Dg.pathDijkstra(g, { id: `q`, out: [ { id: `a`, weight: 2 } ] });
+  expect(distances.get(`q`)).toBe(0);
+  expect(distances.get(`a`)).toBe(2);
+  expect(distances.get(`d`)).toBe(5);
+});

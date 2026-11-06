@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { StackMutable } from "../stack/StackMutable.js"
 import { QueueMutable } from "../queue/queue-mutable.js"
-import { PriorityMutable } from "../queue/priority-mutable.js"
 import { immutable as immutableMap, type IMapImmutable } from "../map/map.js"
 import { NumberMap } from "../map/number-map.js"
 import * as Sync from "@ixfx/iterables/sync"
@@ -601,12 +600,12 @@ export function* bfs(graph: DirectedGraph, startIdOrVertex: string | Vertex, tar
   const target = targetIdOrVertex === undefined ? undefined : resolveVertex(graph, targetIdOrVertex);
 
   const queue = new QueueMutable<Vertex>();
-  const seen = new Set<string>();
+  const seen = new Set<string>([ start.id ]);
   queue.enqueue(start);
   while (!queue.isEmpty) {
     const v = queue.dequeue()!;
     yield v;
-    if (target !== undefined && target === v) return;
+    if (target !== undefined && target.id === v.id) return;
     for (const edge of adjacentVertices(graph, v)) {
       if (!seen.has(edge.id)) {
         seen.add(edge.id);
@@ -669,32 +668,40 @@ export const pathDijkstra = (graph: DirectedGraph, sourceOrId: Vertex | string):
 
   const distances = new Map<string, number>();
   const previous = new Map<string, Vertex | null>();
+  const unvisited = new Set<string>();
 
-  distances.set(source.id, 0);
-
-  const pq = new PriorityMutable<string>();
-
-  const vertices = [ ...graph.vertices.values() ];
-  for (const v of vertices) {
-    if (v.id !== source.id) {
-      distances.set(v.id, Number.MAX_SAFE_INTEGER);
-
-      previous.set(v.id, null);
-    }
-    pq.enqueueWithPriority(v.id, Number.MAX_SAFE_INTEGER);
+  for (const v of graph.vertices.values()) {
+    distances.set(v.id, v.id === source.id ? 0 : Number.MAX_SAFE_INTEGER);
+    if (v.id !== source.id) previous.set(v.id, null);
+    unvisited.add(v.id);
+  }
+  // Source might be a vertex not (yet) in graph
+  if (!distances.has(source.id)) {
+    distances.set(source.id, 0);
+    unvisited.add(source.id);
   }
 
-  while (!pq.isEmpty) {
-    const u = pq.dequeueMin();
-    if (u === undefined) throw new Error(`Bug. Queue unexpectedly empty`);
-    const vertexU = graph.vertices.get(u)!;
+  while (unvisited.size > 0) {
+    // Select closest unvisited vertex (linear scan; avoids reliance on priority queue)
+    let u: string | undefined;
+    let best = Number.POSITIVE_INFINITY;
+    for (const id of unvisited) {
+      const d = distances.get(id)!;
+      if (d < best) {
+        best = d;
+        u = id;
+      }
+    }
+    // Remaining vertices are unreachable
+    if (u === undefined || best === Number.MAX_SAFE_INTEGER) break;
+    unvisited.delete(u);
+
+    const vertexU = u === source.id ? source : graph.vertices.get(u)!;
     for (const neighbour of vertexU.out) {
-      //const vertexNeigbour = graph.vertices.get(neighbour.to)!;
-      const alt = distances.get(u)! + distance(graph, neighbour);
+      const alt = best + distance(graph, neighbour);
       if (alt < distances.get(neighbour.id)!) {
         distances.set(neighbour.id, alt);
         previous.set(neighbour.id, vertexU);
-        pq.changePriority(neighbour.id, alt, true);
       }
     }
   }

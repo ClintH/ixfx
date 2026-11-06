@@ -40,3 +40,22 @@ export * as Directed from './directed-graph.js';
 *
 */
 export * as Undirected from './undirected-graph.js';
+
+/**
+ * Dependency graphs and Excel-style recalculation
+ *
+ * Built on directed graphs. An edge `a -> b` means _b depends on a_.
+ * Provides tracing of precedents/dependents, calculation order, and a
+ * small immutable calculation engine that only recomputes what has changed.
+ *
+ * @example Spreadsheet-style
+ * ```js
+ * let s = Dependencies.calc();
+ * s = Dependencies.setValue(s, `a`, 1).state;
+ * s = Dependencies.setValue(s, `b`, 2).state;
+ * s = Dependencies.setFormula(s, `c`, [`a`, `b`], get => get(`a`) + get(`b`)).state;
+ * const r = Dependencies.setValue(s, `a`, 10);
+ * // r.recalculated: [`c`]
+ * ```
+ */
+export * as Dependencies from './dependency-graph.js';
