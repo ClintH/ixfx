@@ -1,7 +1,7 @@
 {
   "name": "@ixfx/collections",
   "type": "module",
-  "version": "0.56.16",
+  "version": "0.56.17",
   "description": "ixfx collections",
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "license": "MIT",
@@ -78,6 +78,5 @@
       "./tree": "./dist/tree/index.js",
       "./package.json": "./package.json"
     }
-  },
-  "main": "./dist/index.js"
+  }
 }

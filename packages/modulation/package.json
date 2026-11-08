@@ -1,7 +1,7 @@
 {
   "name": "@ixfx/modulation",
   "type": "module",
-  "version": "0.56.16",
+  "version": "0.56.17",
   "description": "ixfx modulation",
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "license": "MIT",
@@ -73,6 +73,5 @@
     "@ixfx/guards": "workspace:*",
     "@ixfx/numbers": "workspace:*",
     "@ixfx/random": "workspace:*"
-  },
-  "main": "./dist/index.js"
+  }
 }

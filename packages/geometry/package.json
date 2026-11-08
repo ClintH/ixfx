@@ -1,6 +1,6 @@
 {
   "name": "@ixfx/geometry",
-  "version": "0.56.16",
+  "version": "0.56.17",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -122,6 +122,5 @@
   },
   "inlinedDependencies": {
     "bezier-js": "6.1.4"
-  },
-  "main": "./dist/index.js"
+  }
 }

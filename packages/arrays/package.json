@@ -1,7 +1,7 @@
 {
   "name": "@ixfx/arrays",
   "type": "module",
-  "version": "0.56.16",
+  "version": "0.56.17",
   "description": "ixfx arrays",
   "author": "Clint Heyer <clint@thestaticvoid.net>",
   "license": "MIT",
@@ -49,6 +49,5 @@
   "engines": {
     "node": ">=24.0.0"
   },
-  "scripts": {},
-  "main": "./dist/index.js"
+  "scripts": {}
 }
