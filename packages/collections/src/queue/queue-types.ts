@@ -11,7 +11,7 @@ export type QueueDiscardPolicy = `older` | `newer` | `additions`;
  * ```
  */
 export type QueueOpts<V> = {
-  readonly eq?: IsEqual<V>
+  readonly eq?: IsEqual<V>;
   /**
    * @private
    */
@@ -25,7 +25,9 @@ export type QueueOpts<V> = {
    *
    * `older`: Removes items front of the queue (ie older items are discarded)
    *
-   * `newer`: Remove from rear of queue to make space for new items (ie newer items are discarded)
+   * `newer`: Remove from rear of queue to make space for new items (ie newer items are discarded).
+   * Adding several items at once gives the same result as adding them one at a time:
+   * once full, each addition replaces the item at the rear.
    *
    * `additions`: Only adds new items that there are room for (ie. brand new items are discarded)
    *

@@ -108,7 +108,7 @@ test(`unbounded-older`, () => {
   f = f.enqueue(`test3`, `test4`, `test5`);
   expect(f.toArray()).toEqual([ `test2`, `test3`, `test4`, `test5` ]);
 
-  // Older items are discarded (ie test0, test1) - complete flush
+  // Older items are discarded (ie test0, test1) - more additions than capacity
   f = immutable<string>(
     { capacity: 4, discardPolicy: `older` },
     `test0`,
@@ -118,7 +118,7 @@ test(`unbounded-older`, () => {
   f = f.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
   expect(f.toArray()).toEqual([ `test4`, `test5`, `test6`, `test7` ]);
 
-  // Older items are discarded (ie test0, test1) - exact flush
+  // Older items are discarded (ie test0, test1) - additions equal to capacity
   f = immutable<string>(
     { capacity: 3, discardPolicy: `older` },
     `test0`,
@@ -140,7 +140,7 @@ test(`unbounded-newer`, () => {
   g = g.enqueue(`test3`, `test4`, `test5`);
   expect(g.toArray()).toEqual([ `test0`, `test1`, `test2`, `test5` ]);
 
-  // Newer items are discarded (ie test1, test2) - complete flush
+  // Newer items are discarded (ie test1, test2) - more additions than capacity
   g = immutable<string>(
     { capacity: 4, discardPolicy: `newer` },
     `test0`,
@@ -148,9 +148,10 @@ test(`unbounded-newer`, () => {
     `test2`
   );
   g = g.enqueue(`test3`, `test4`, `test5`, `test6`, `test7`);
-  expect(g.toArray()).toEqual([ `test4`, `test5`, `test6`, `test7` ]);
+  // Same as enqueuing one at a time: once full, each addition replaces the newest
+  expect(g.toArray()).toEqual([ `test0`, `test1`, `test2`, `test7` ]);
 
-  // Newer items are discarded (ie test1, test2) - exact flush
+  // Newer items are discarded (ie test1, test2) - additions equal to capacity
   g = immutable<string>(
     { capacity: 3, discardPolicy: `newer` },
     `test0`,
@@ -158,7 +159,7 @@ test(`unbounded-newer`, () => {
     `test2`
   );
   g = g.enqueue(`test3`, `test4`, `test5`);
-  expect(g.toArray()).toEqual([ `test3`, `test4`, `test5` ]);
+  expect(g.toArray()).toEqual([ `test0`, `test1`, `test5` ]);
 
   // One item past capacity with newer
   g = immutable<string>(

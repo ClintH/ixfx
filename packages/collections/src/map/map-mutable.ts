@@ -1,6 +1,6 @@
-import { type EitherKey } from '../types.js';
+import type { EitherKey } from '../types.js';
 import type { IMapBase } from './imap-base.js';
-import { add, del, set, has } from './map-immutable-fns.js';
+import { addInPlace } from './map-immutable-fns.js';
 
 /**
  * A mutable map.
@@ -10,7 +10,6 @@ import { add, del, set, has } from './map-immutable-fns.js';
  * @typeParam K - Type of map keys. Typically `string`
  * @typeParam V - Type of stored values
  */
-//eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface IMapMutable<K, V> extends IMapBase<K, V> {
   /**
    * Adds one or more items to map
@@ -25,22 +24,22 @@ export interface IMapMutable<K, V> extends IMapBase<K, V> {
    * @param itemsToAdd
    * @param itemsToAdd
    */
-  add(...itemsToAdd: EitherKey<K, V>): void;
+  add: (...itemsToAdd: EitherKey<K, V>) => void;
   /**
    * Sets a value to a specified key
    * @param key
    * @param value
    */
-  set(key: K, value: V): void;
+  set: (key: K, value: V) => void;
   /**
    * Deletes an item by key
    * @param key
    */
-  delete(key: K): void;
+  delete: (key: K) => void;
   /**
    * Clears map
    */
-  clear(): void;
+  clear: () => void;
 }
 
 /**
@@ -62,26 +61,27 @@ export interface IMapMutable<K, V> extends IMapBase<K, V> {
  * ```
  * @param data Optional initial data in the form of an array of `{ key: value }` or `[ key, value ]`
  */
-export const mutable = <K, V>(...data: EitherKey<K, V>): IMapMutable<K, V> => {
-  // eslint-disable-next-line functional/no-let
-  let m = add(new Map<K, V>(), ...data);
+export function mutable<K, V>(...data: EitherKey<K, V>): IMapMutable<K, V> {
+  // Changed in place: a mutable map has no need to copy on each write
+  const m = new Map<K, V>();
+  addInPlace(m, ...data);
   return {
     add: (...data: EitherKey<K, V>) => {
-      m = add(m, ...data);
+      addInPlace(m, ...data);
     },
     delete: (key: K) => {
-      m = del(m, key);
+      m.delete(key);
     },
     clear: () => {
-      m = add(new Map<K, V>());
+      m.clear();
     },
     set: (key: K, value: V): void => {
-      m = set(m, key, value);
+      m.set(key, value);
     },
     get: (key: K): V | undefined => m.get(key),
     entries: () => m.entries(),
     values: () => m.values(),
     isEmpty: () => m.size === 0,
-    has: (key: K) => has(m, key),
+    has: (key: K) => m.has(key),
   };
-};
+}

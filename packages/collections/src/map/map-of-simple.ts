@@ -1,9 +1,8 @@
-import type { ToString, IsEqual } from '@ixfx/core';
-import type { IMapOf } from './imap-of.js';
+import type { IsEqual, ToString } from '@ixfx/core';
 import type { IMapOfImmutable } from './imap-of-immutable.js';
+import type { IMapOf } from './imap-of.js';
 import { defaultKeyer, isEqualDefault } from '@ixfx/core';
 import { MapOfSimpleBase } from './map-of-simple-base.js';
-import { MapOfSimpleMutable } from './map-of-simple-mutable.js';
 
 /**
  * Simple immutable MapOf
@@ -11,81 +10,95 @@ import { MapOfSimpleMutable } from './map-of-simple-mutable.js';
 export class MapOfSimple<V>
   extends MapOfSimpleBase<V>
   implements IMapOf<V>, IMapOfImmutable<V> {
+  /**
+   * Returns a new instance wrapping `map` without copying it.
+   * Value arrays are never changed in place, so they can be shared between instances.
+   */
+  #withMap(map: Map<string, readonly V[]>): MapOfSimple<V> {
+    const m = new MapOfSimple<V>(this.groupBy, this.valueEq);
+    m.map = map;
+    return m;
+  }
+
+  /**
+   * Appends grouped values, copying the map once.
+   * Each key's array is rebuilt once, regardless of how many values are added under it.
+   */
+  #addGrouped(grouped: Iterable<readonly [ key: string, values: readonly V[] ]>): MapOfSimple<V> {
+    const m = new Map(this.map);
+    for (const [key, values] of grouped) {
+      const existing = m.get(key);
+      m.set(key, existing === undefined ? [...values] : [...existing, ...values]);
+    }
+    return this.#withMap(m);
+  }
 
   addKeyedValues(key: string, ...values: V[]): MapOfSimple<V> {
-    //const asEntries = values.map(v => [key, v]) as [string, V[]][];
-    //return this.addBatch(asEntries);
-    return this.addBatch([ [ key, values ] ]);
+    return this.#addGrouped([[key, values]]);
   }
 
   addValue(...values: readonly V[]): MapOfSimple<V> {
-    const temporary = new MapOfSimpleMutable<V>(this.groupBy, this.valueEq, this.getRawMapUnsafe);
-    temporary.addValue(...values);
-    return new MapOfSimple<V>(this.groupBy, this.valueEq, [ ...temporary.entries() ]);
+    if (values.length === 0)
+      return this;
+    const grouped = new Map<string, V[]>();
+    for (const v of values) {
+      const key = this.groupBy(v);
+      const list = grouped.get(key);
+      if (list === undefined)
+        grouped.set(key, [v]);
+      else list.push(v);
+    }
+    return this.#addGrouped(grouped);
   }
 
-  addBatch(batch: [ key: string, value: V[] ][]): MapOfSimple<V> {
-    const temporary = new MapOfSimpleMutable<V>(this.groupBy, this.valueEq, this.getRawMapUnsafe);
-    for (const b of batch) {
-      temporary.addKeyedValues(b[ 0 ], ...b[ 1 ]);
-    }
-    return new MapOfSimple<V>(this.groupBy, this.valueEq, [ ...temporary.entries() ]);
-
-    // // Deep copy Map
-    // const temporary = new Map<string, V[]>(
-    //   [ ...this.map.entries() ].map((entry) => [ entry[ 0 ], [ ...entry[ 1 ] ] ])
-    // );
-
-    // for (const [ key, list ] of batch) {
-    //   // Does key exist already?
-    //   const existingList = temporary.get(key);
-    //   if (typeof existingList === `undefined`) {
-    //     // No, use the batch input as the data for this key
-    //     temporary.set(key, list);
-    //   } else {
-    //     // Yes
-    //     existingList.push(...list);
-    //   }
-    // }
-    // return new MapOfSimple<V>(this.groupBy, this.valueEq, [ ...temporary.entries() ]);
+  addBatch(batch: Array<[ key: string, value: V[] ]>): MapOfSimple<V> {
+    return this.#addGrouped(batch);
   }
 
   clear(): MapOfSimple<V> {
+    if (this.map.size === 0)
+      return this;
     return new MapOfSimple<V>(this.groupBy, this.valueEq);
   }
 
   deleteKeyValue(_key: string, _value: V, eq?: IsEqual<V>): MapOfSimple<V> {
     const eqFunction = eq ?? this.valueEq;
-    const entries = [ ...this.map.entries() ];
-    const x = entries
-      .map((entry): [ key: string, values: readonly V[] ] => {
-        const k = entry[ 0 ];
-        if (k !== _key) return entry;
-        const values: readonly V[] = entry[ 1 ].filter(v => !eqFunction(v, _value));
-        return [ k, values ]
-      })
-      .filter(entry => entry[ 1 ].length > 0)
+    const existing = this.map.get(_key);
+    if (existing === undefined)
+      return this;
+    const values = existing.filter(v => !eqFunction(v, _value));
+    if (values.length === existing.length)
+      return this;
 
-    return new MapOfSimple<V>(this.groupBy, this.valueEq, x);
+    const m = new Map(this.map);
+    if (values.length === 0)
+      m.delete(_key);
+    else m.set(_key, values);
+    return this.#withMap(m);
   }
 
   deleteByValue(value: V, eq?: IsEqual<V>): MapOfSimple<V> {
-    const entries = [ ...this.map.entries() ];
     const eqFunction = eq ?? this.valueEq;
-    const x = entries
-      .map((entry) => {
-        const key = entry[ 0 ];
-        const values = entry[ 1 ].filter((vv) => !eqFunction(vv, value)) as readonly V[];
-        return [ key, values ] as [ string, V[] ];
-      })
-      .filter(entry => entry[ 1 ].length > 0)
-
-    return new MapOfSimple<V>(this.groupBy, this.valueEq, x);
+    // Only copy the map if something is actually removed
+    let m: Map<string, readonly V[]> | undefined;
+    for (const [key, existing] of this.map) {
+      const values = existing.filter(vv => !eqFunction(vv, value));
+      if (values.length === existing.length)
+        continue;
+      m ??= new Map(this.map);
+      if (values.length === 0)
+        m.delete(key);
+      else m.set(key, values);
+    }
+    return m === undefined ? this : this.#withMap(m);
   }
 
   delete(key: string): MapOfSimple<V> {
-    const entries = [ ...this.map.entries() ].filter((entry) => entry[ 0 ] !== key);
-    return new MapOfSimple<V>(this.groupBy, this.valueEq, entries);
+    if (!this.map.has(key))
+      return this;
+    const m = new Map(this.map);
+    m.delete(key);
+    return this.#withMap(m);
   }
 }
 
@@ -107,7 +120,6 @@ export class MapOfSimple<V>
  * @typeParam V - Type of items
  * @returns New instance
  */
-export const ofSimple = <V>(
-  groupBy: ToString<V> = defaultKeyer,
-  valueEq: IsEqual<V> = isEqualDefault<V>
-): IMapOfImmutable<V> => new MapOfSimple<V>(groupBy, valueEq);
+export function ofSimple<V>(groupBy: ToString<V> = defaultKeyer, valueEq: IsEqual<V> = isEqualDefault<V>): IMapOfImmutable<V> {
+  return new MapOfSimple<V>(groupBy, valueEq);
+}

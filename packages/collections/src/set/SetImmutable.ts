@@ -1,14 +1,28 @@
-import { defaultKeyer, type ToString, toStringDefault } from '@ixfx/core';
-import { type ISetImmutable } from './ISetImmutable.js';
+import type { ToString } from '@ixfx/core';
+import type { ISetImmutable } from './ISetImmutable.js';
+import { defaultKeyer, toStringDefault } from '@ixfx/core';
 
 export class SetStringImmutable<V> implements ISetImmutable<V> {
   private store: Map<string, V>;
   private keyString;
 
-  //eslint-disable-next-line functional/prefer-immutable-types
+  /**
+   * Constructor
+   * @param keyString Function to produce a key for a value
+   * @param map Initial data. It is copied, so later changes to it don't affect the set.
+   */
   constructor(keyString?: ToString<V>, map?: Map<string, V>) {
-    this.store = map ?? new Map<string, V>();
+    this.store = map === undefined ? new Map<string, V>() : new Map(map);
     this.keyString = keyString ?? defaultKeyer<V>;
+  }
+
+  /**
+   * Wraps `store` without copying. `store` must not be changed afterwards.
+   */
+  #withStore(store: Map<string, V>): SetStringImmutable<V> {
+    const s = new SetStringImmutable<V>(this.keyString);
+    s.store = store;
+    return s;
   }
 
   get size(): number {
@@ -16,19 +30,27 @@ export class SetStringImmutable<V> implements ISetImmutable<V> {
   }
 
   add(...values: readonly V[]): ISetImmutable<V> {
-    const s = new Map<string, V>(this.store);
+    // Only copy once we find a value that actually changes the set
+    let s: Map<string, V> | undefined;
     for (const v of values) {
       const key = this.keyString(v);
+      if (s === undefined) {
+        if (this.store.has(key) && Object.is(this.store.get(key), v))
+          continue;
+        s = new Map<string, V>(this.store);
+      }
       s.set(key, v);
     }
-    return new SetStringImmutable<V>(this.keyString, s);
+    return s === undefined ? this : this.#withStore(s);
   }
 
   delete(v: V): ISetImmutable<V> {
-    const s = new Map<string, V>(this.store);
     const key = this.keyString(v);
-    if (s.delete(key)) return new SetStringImmutable(this.keyString, s);
-    return this;
+    if (!this.store.has(key))
+      return this;
+    const s = new Map<string, V>(this.store);
+    s.delete(key);
+    return this.#withStore(s);
   }
 
   has(v: V): boolean {
@@ -37,10 +59,10 @@ export class SetStringImmutable<V> implements ISetImmutable<V> {
   }
 
   toArray(): V[] {
-    return [ ...this.store.values() ];
+    return [...this.store.values()];
   }
 
-  *values(): Generator<V, void, unknown> {
+  * values(): Generator<V, void, unknown> {
     yield* this.store.values();
   }
 }
@@ -51,6 +73,6 @@ export class SetStringImmutable<V> implements ISetImmutable<V> {
  * @param keyString Function that produces a key based on a value. If unspecified, uses `JSON.stringify`.
  * @returns
  */
-export const immutable = <V>(
-  keyString: ToString<V> = toStringDefault
-): ISetImmutable<V> => new SetStringImmutable(keyString);
+export function immutable<V>(keyString: ToString<V> = toStringDefault): ISetImmutable<V> {
+  return new SetStringImmutable(keyString);
+}

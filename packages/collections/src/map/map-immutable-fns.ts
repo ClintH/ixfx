@@ -1,43 +1,49 @@
 import type { ArrayKeys, EitherKey, ObjectKeys } from '../types.js';
 
 /**
- * Adds an array o [k,v] to the map, returning a new instance
- * @param map Initial data
+ * Sets an array of [k,v] into `target`, mutating it
+ * @param target Map to change
  * @param data Data to add
- * @returns New map with data added
  */
-const addArray = <K, V>(
-  map: ReadonlyMap<K, V>,
-  data: ArrayKeys<K, V>
-): ReadonlyMap<K, V> => {
-  const x = new Map<K, V>(map.entries());
+function setArray<K, V>(target: Map<K, V>, data: ArrayKeys<K, V>): void {
   for (const d of data) {
-    if (d[ 0 ] === undefined) throw new Error(`key cannot be undefined`);
-    if (d[ 1 ] === undefined) throw new Error(`value cannot be undefined`);
-    x.set(d[ 0 ], d[ 1 ]);
+    if (d[0] === undefined)
+      throw new Error(`key cannot be undefined`);
+    if (d[1] === undefined)
+      throw new Error(`value cannot be undefined`);
+    target.set(d[0], d[1]);
   }
-  return x;
-};
+}
 
 /**
- * Adds objects to the map, returning a new instance
- * @param map Initial data
+ * Sets objects of {key,value} into `target`, mutating it
+ * @param target Map to change
  * @param data Data to add
- * @returns A new map with data added
  */
-const addObjects = <K, V>(
-  map: ReadonlyMap<K, V>,
-  data: ObjectKeys<K, V>
-): ReadonlyMap<K, V> => {
-  const x = new Map<K, V>(map.entries());
+function setObjects<K, V>(target: Map<K, V>, data: ObjectKeys<K, V>): void {
   for (const d of data) {
-    if (d.key === undefined) throw new Error(`key cannot be undefined`);
-    if (d.value === undefined) throw new Error(`value cannot be undefined`);
-
-    x.set(d.key, d.value);
+    if (d.key === undefined)
+      throw new Error(`key cannot be undefined`);
+    if (d.value === undefined)
+      throw new Error(`value cannot be undefined`);
+    target.set(d.key, d.value);
   }
-  return x;
-};
+}
+
+/**
+ * Adds data to `target` in place, in the form of [key,value] or {key, value}.
+ * @param target Map to change
+ * @param data Data to add
+ */
+export function addInPlace<K, V>(target: Map<K, V>, ...data: EitherKey<K, V>): void {
+  if (data.length === 0)
+    return;
+  const firstRecord = data[0] as { readonly key: K; readonly value: V };
+  const isObject = typeof firstRecord.key !== `undefined` && typeof firstRecord.value !== `undefined`;
+  if (isObject)
+    setObjects(target, data as ObjectKeys<K, V>);
+  else setArray(target, data as ArrayKeys<K, V>);
+}
 
 /**
  * Returns true if map contains key
@@ -50,8 +56,9 @@ const addObjects = <K, V>(
  * @param key Key to find
  * @returns True if map contains key
  */
-export const has = <K, V>(map: ReadonlyMap<K, V>, key: K): boolean =>
-  map.has(key);
+export function has<K, V>(map: ReadonlyMap<K, V>, key: K): boolean {
+  return map.has(key);
+}
 
 /**
  * Adds data to a map, returning the new map.
@@ -67,49 +74,45 @@ export const has = <K, V>(map: ReadonlyMap<K, V>, key: K): boolean =>
  * @param data One or more data to add in the form of [key,value] or {key, value}
  * @returns New map with data added
  */
-export const add = <K, V>(
-  map: ReadonlyMap<K, V>,
-  ...data: EitherKey<K, V>
-): ReadonlyMap<K, V> => {
-  if (map === undefined) throw new Error(`map parameter is undefined`);
-  if (data === undefined) throw new Error(`data parameter i.s undefined`);
-  if (data.length === 0) return map;
-
-  const firstRecord = data[ 0 ];
-  const isObject =
-    typeof (firstRecord as { readonly key: K; readonly value: V }).key !==
-    `undefined` &&
-    typeof (firstRecord as { readonly key: K; readonly value: V }).value !==
-    `undefined`; //(typeof (data[0] as {readonly key:K}).key !== undefined && typeof (data[0] as {readonly value:V}).value !== undefined);
-  return isObject
-    ? addObjects(map, data as ObjectKeys<K, V>)
-    : addArray(map, data as ArrayKeys<K, V>);
-};
+export function add<K, V>(map: ReadonlyMap<K, V>, ...data: EitherKey<K, V>): ReadonlyMap<K, V> {
+  if (map === undefined)
+    throw new Error(`map parameter is undefined`);
+  if (data === undefined)
+    throw new Error(`data parameter i.s undefined`);
+  if (data.length === 0)
+    return map;
+  const x = new Map<K, V>(map);
+  addInPlace(x, ...data);
+  return x;
+}
 
 /**
- * Sets data in a copy of the initial map
+ * Sets data in a copy of the initial map.
+ * If `key` already holds `value` (compared with `Object.is`), `map` is returned as-is.
  * @param map Initial map
  * @param key Key
  * @param value Value to  set
- * @returns New map with data set
+ * @returns New map with data set, or `map` if nothing changed
  */
-export const set = <K, V>(map: ReadonlyMap<K, V>, key: K, value: V): Map<K, V> => {
-  const x = new Map<K, V>(map.entries());
+export function set<K, V>(map: ReadonlyMap<K, V>, key: K, value: V): ReadonlyMap<K, V> {
+  if (map.has(key) && Object.is(map.get(key), value))
+    return map;
+  const x = new Map<K, V>(map);
   x.set(key, value);
   return x;
-};
+}
 
 /**
- * Delete a key from the map, returning a new map
+ * Delete a key from the map, returning a new map.
+ * If `key` is not present, `map` is returned as-is.
  * @param map Initial data
  * @param key
- * @returns New map with data deleted
+ * @returns New map with data deleted, or `map` if nothing changed
  */
-export const del = <K, V>(
-  map: ReadonlyMap<K, V>,
-  key: K
-): ReadonlyMap<K, V> => {
-  const x = new Map<K, V>(map.entries());
+export function del<K, V>(map: ReadonlyMap<K, V>, key: K): ReadonlyMap<K, V> {
+  if (!map.has(key))
+    return map;
+  const x = new Map<K, V>(map);
   x.delete(key);
   return x;
-};
+}

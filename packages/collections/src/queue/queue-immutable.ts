@@ -1,6 +1,6 @@
 import type { IQueueImmutable } from './iqueue-immutable.js';
-import { peek, isFull, isEmpty, enqueue, dequeue } from './queue-fns.js';
-import { type QueueOpts } from './queue-types.js';
+import type { QueueOpts } from './queue-types.js';
+import { dequeue, enqueue, isEmpty, isFull, peek } from './queue-fns.js';
 
 // -------------------------------
 // Immutable
@@ -12,37 +12,48 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
   /**
    * Creates an instance of Queue.
    * @param {QueueOpts} opts Options foor queue
-   * @param {V[]} data Initial data. Index 0 is front of queue
+   * @param {V[]} data Initial data. Index 0 is front of queue. It is copied, so later changes to it don't affect the queue.
    */
   constructor(opts: QueueOpts<V> = {}, data: readonly V[] = []) {
-    if (opts === undefined) throw new Error(`opts parameter undefined`);
+    if (opts === undefined)
+      throw new Error(`opts parameter undefined`);
 
     this.opts = opts;
-    this.#data = data;
+    this.#data = data.length === 0 ? [] : [...data];
+  }
+
+  /**
+   * Wraps data without copying. Returns `this` if data is unchanged.
+   * `data` must not be referenced elsewhere in a way that could change it.
+   */
+  #withData(data: readonly V[]): QueueImmutable<V> {
+    if (data === this.#data)
+      return this;
+    const q = new QueueImmutable<V>(this.opts);
+    q.#data = data;
+    return q;
   }
 
   forEach(fn: (v: V) => void): void {
-    //eslint-disable-next-line functional/no-let
     for (let index = this.#data.length - 1; index >= 0; index--) {
-      fn(this.#data[ index ]);
+      fn(this.#data[index]);
     }
   }
 
   forEachFromFront(fn: (v: V) => void): void {
     // From front of queue
 
-    this.#data.forEach(item => { fn(item) }); //(vv) => fn(vv));
+    this.#data.forEach((item) => {
+      fn(item);
+    }); // (vv) => fn(vv));
   }
 
   enqueue(...toAdd: readonly V[] | V[]): QueueImmutable<V> {
-    return new QueueImmutable<V>(
-      this.opts,
-      enqueue(this.opts, this.#data, ...toAdd)
-    );
+    return this.#withData(enqueue(this.opts, this.#data, ...toAdd));
   }
 
   dequeue(): QueueImmutable<V> {
-    return new QueueImmutable<V>(this.opts, dequeue(this.opts, this.#data));
+    return this.#withData(dequeue(this.opts, this.#data));
   }
 
   get isEmpty(): boolean {
@@ -62,7 +73,7 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
   }
 
   toArray(): V[] {
-    return [ ...this.#data ];
+    return [...this.#data];
   }
 }
 
@@ -87,10 +98,7 @@ export class QueueImmutable<V> implements IQueueImmutable<V> {
  * @param startingItems Index 0 is the front of the queue
  * @returns A new queue
  */
-export const immutable = <V>(
-  options: QueueOpts<V> = {},
-  ...startingItems: readonly V[]
-): IQueueImmutable<V> => {
-  options = { ...options }; // Make a copy of options
-  return new QueueImmutable(options, [ ...startingItems ]); // Make a copy of array so it can't be modified
-};
+export function immutable<V>(options: QueueOpts<V> = {}, ...startingItems: readonly V[]): IQueueImmutable<V> {
+  // Copy options so they can't be changed later. Constructor copies startingItems.
+  return new QueueImmutable({ ...options }, startingItems);
+}

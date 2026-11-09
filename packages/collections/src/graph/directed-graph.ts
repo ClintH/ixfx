@@ -1,9 +1,7 @@
-/* eslint-disable ts/no-non-null-assertion */
 import type { Result } from "@ixfx/guards";
 import type { IMapImmutable } from "../map/map.js";
 import { resultThrow, stringTest } from "@ixfx/guards";
-import * as Sync from "@ixfx/iterables/sync";
-import { immutable as immutableMap } from "../map/map.js";
+import { immutableFromOwned } from "../map/map.js";
 import { NumberMap } from "../map/number-map.js";
 import { QueueMutable } from "../queue/queue-mutable.js";
 import { StackMutable } from "../stack/StackMutable.js";
@@ -221,8 +219,7 @@ export function* edges(graph: DirectedGraph): Generator<Readonly<{
 }>, void, unknown> {
   resultThrow(graphTest(graph));
 
-  const vertices = [...graph.vertices.values()];
-  for (const vertex of vertices) {
+  for (const vertex of graph.vertices.values()) {
     for (const edge of vertex.out) {
       yield edge;
     }
@@ -239,10 +236,7 @@ export function* vertices(graph: DirectedGraph): Generator<Readonly<{
 }>, void, unknown> {
   resultThrow(graphTest(graph));
 
-  const vertices = [...graph.vertices.values()];
-  for (const vertex of vertices) {
-    yield vertex;
-  }
+  yield* graph.vertices.values();
 }
 
 // function throwGraphTest(g: DirectedGraph, parameterName = `graph`) {
@@ -462,11 +456,14 @@ export function removeVertex(graph: DirectedGraph, idOrVertex: string | Vertex):
 
   // Collect first, since changing the map while iterating it is unsafe within withMutations
   const pointing = [...graph.vertices.values()].filter(v => v.id !== id && v.out.some(edge => edge.id === id));
-  let vertices = graph.vertices.delete(id);
-  for (const v of pointing) {
-    vertices = vertices.set(v.id, { ...v, out: v.out.filter(edge => edge.id !== id) });
-  }
-  return { ...graph, vertices };
+  // Batch so the vertex map is copied once, rather than once per change
+  return withMutations(graph, (draft) => {
+    let vertices = draft.vertices.delete(id);
+    for (const v of pointing) {
+      vertices = vertices.set(v.id, { ...v, out: v.out.filter(edge => edge.id !== id) });
+    }
+    return { ...draft, vertices };
+  });
 }
 
 /**
@@ -541,24 +538,28 @@ export function connectWithEdges(graph: DirectedGraph, options: ConnectOptions):
   const toList = Array.isArray(to) ? to : [to];
 
   const edges: Edge[] = [];
-  // Connect from -> to
-  for (const toSingle of toList) {
-    const result = connectTo(graph, from, toSingle, weight);
-    graph = result.graph;
-    edges.push(result.edge);
-  }
+  // Batch so the vertex map is copied at most once, rather than up to
+  // three times per edge (create 'from', create 'to', add edge)
+  const g = withMutations(graph, (draft) => {
+    // Connect from -> to
+    for (const toSingle of toList) {
+      const result = connectTo(draft, from, toSingle, weight);
+      draft = result.graph;
+      edges.push(result.edge);
+    }
+    if (!bidi)
+      return draft;
 
-  if (!bidi)
-    return { graph, edges };
-
-  // Bidirectional connection
-  // Connect to -> from
-  for (const toSingle of toList) {
-    const result = connectTo(graph, toSingle, from, weight);
-    graph = result.graph;
-    edges.push(result.edge);
-  }
-  return { graph, edges };
+    // Bidirectional connection
+    // Connect to -> from
+    for (const toSingle of toList) {
+      const result = connectTo(draft, toSingle, from, weight);
+      draft = result.graph;
+      edges.push(result.edge);
+    }
+    return draft;
+  });
+  return { graph: g, edges };
 }
 
 /**
@@ -757,7 +758,7 @@ export function clone(graph: DirectedGraph): DirectedGraph {
   resultThrow(graphTest(graph));
 
   const g: DirectedGraph = {
-    vertices: immutableMap<string, Vertex>([...graph.vertices.entries()]),
+    vertices: immutableFromOwned(new Map(graph.vertices.entries() as Iterable<[string, Vertex]>)),
   };
   return g;
 }
@@ -780,7 +781,7 @@ export function clone(graph: DirectedGraph): DirectedGraph {
  */
 export function graph(...initialConnections: ConnectOptions[]): DirectedGraph {
   const empty: DirectedGraph = {
-    vertices: immutableMap(),
+    vertices: immutableFromOwned(new Map()),
   };
   if (initialConnections.length === 0)
     return empty;
@@ -892,12 +893,10 @@ export function topologicalSortTry(graph: DirectedGraph): Result<DirectedGraph, 
  * @returns
  */
 export function graphFromVertices(vertices: Iterable<Vertex>): DirectedGraph {
-  const keyValues = Sync.map(vertices, (f) => {
-    return [f.id, f] as [ string, Vertex ];
-  });
-  const m = immutableMap<string, Vertex>([...keyValues]);
+  const m = new Map<string, Vertex>();
+  for (const v of vertices) m.set(v.id, v);
   return {
-    vertices: m,
+    vertices: immutableFromOwned(m),
   };
 }
 

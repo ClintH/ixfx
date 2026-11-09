@@ -2,52 +2,75 @@
 // Immutable
 // -------------------------
 import type { IStackImmutable } from './IStackImmutable.js';
-import { push, pop, isEmpty, isFull, peek } from './StackFns.js';
 import type { StackOpts } from './types.js';
+import { isEmpty, isFull, peek, pop, push } from './StackFns.js';
 
 export class StackImmutable<V> implements IStackImmutable<V> {
   private readonly opts: StackOpts;
-  /* eslint-disable-next-line functional/prefer-readonly-type */
-  readonly data: ReadonlyArray<V>;
+  #data: readonly V[];
 
-  constructor(opts: StackOpts = {}, data: ReadonlyArray<V> = []) {
+  /**
+   * Constructor
+   * @param opts Options
+   * @param data Initial data. Index 0 is bottom of stack. It is copied, so later changes to it don't affect the stack.
+   */
+  constructor(opts: StackOpts = {}, data: readonly V[] = []) {
     this.opts = opts;
-    this.data = data;
+    this.#data = data.length === 0 ? [] : [...data];
   }
 
-  push(...toAdd: ReadonlyArray<V>): StackImmutable<V> {
-    return new StackImmutable<V>(
-      this.opts,
-      push(this.opts, this.data, ...toAdd)
-    );
+  /**
+   * Underlying data. Index 0 is bottom of stack.
+   */
+  get data(): readonly V[] {
+    return this.#data;
+  }
+
+  /**
+   * Wraps data without copying. Returns `this` if data is unchanged.
+   */
+  #withData(data: readonly V[]): StackImmutable<V> {
+    if (data === this.#data)
+      return this;
+    const s = new StackImmutable<V>(this.opts);
+    s.#data = data;
+    return s;
+  }
+
+  push(...toAdd: readonly V[]): StackImmutable<V> {
+    if (toAdd.length === 0)
+      return this;
+    return this.#withData(push(this.opts, this.#data, ...toAdd));
   }
 
   pop(): IStackImmutable<V> {
-    return new StackImmutable<V>(this.opts, pop(this.opts, this.data));
+    return this.#withData(pop(this.opts, this.#data));
   }
 
   forEach(fn: (v: V) => void): void {
-    this.data.forEach(fn);
+    this.#data.forEach(fn);
   }
 
   forEachFromTop(fn: (v: V) => void): void {
-    [ ...this.data ].reverse().forEach(fn);
+    for (let index = this.#data.length - 1; index >= 0; index--) {
+      fn(this.#data[index]);
+    }
   }
 
   get isEmpty(): boolean {
-    return isEmpty(this.opts, this.data);
+    return isEmpty(this.opts, this.#data);
   }
 
   get isFull(): boolean {
-    return isFull(this.opts, this.data);
+    return isFull(this.opts, this.#data);
   }
 
   get peek(): V | undefined {
-    return peek(this.opts, this.data);
+    return peek(this.opts, this.#data);
   }
 
   get length(): number {
-    return this.data.length;
+    return this.#data.length;
   }
 }
 
@@ -74,7 +97,6 @@ export class StackImmutable<V> implements IStackImmutable<V> {
  * @param options Options
  * @param startingItems List of items to add to stack. Items will be pushed 'left to right', ie array index 0 will be bottom of the stack.
  */
-export const immutable = <V>(
-  options: StackOpts = {},
-  ...startingItems: ReadonlyArray<V>
-): IStackImmutable<V> => new StackImmutable({ ...options }, [ ...startingItems ]);
+export function immutable<V>(options: StackOpts = {}, ...startingItems: readonly V[]): IStackImmutable<V> {
+  return new StackImmutable({ ...options }, startingItems);
+} // Constructor copies startingItems

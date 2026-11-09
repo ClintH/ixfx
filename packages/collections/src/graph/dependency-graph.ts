@@ -69,8 +69,18 @@ export function dependentsOf(g: DependencyGraph, id: string): string[] {
  * Use when precedents of many nodes are needed.
  */
 function precedentsLookup(g: DependencyGraph): (id: string) => string[] {
-  const t = Directed.transpose(g);
-  return id => t.vertices.get(id)?.out.map(e => e.id) ?? [];
+  // Plain reverse index; avoids building a whole transposed graph
+  const lookup = new Map<string, string[]>();
+  for (const v of g.vertices.values()) {
+    for (const edge of v.out) {
+      const list = lookup.get(edge.id);
+      if (list === undefined)
+        lookup.set(edge.id, [v.id]);
+      else
+        list.push(v.id);
+    }
+  }
+  return id => lookup.get(id) ?? [];
 }
 
 /**
@@ -281,20 +291,30 @@ export const getValue = <V>(state: CalcState<V>, id: string): V | undefined => s
  * Recompute `order` nodes, skipping any whose precedents have all
  * kept their value (early cut-off). `dirty` is the set of nodes whose
  * value changed, which seeds the process.
+ *
+ * `state.values` is updated in place, so it must be a map the caller has
+ * just created (not one shared with a previous state).
  */
-function propagate<V>(state: CalcState<V>, order: readonly string[], dirty: ReadonlySet<string>): CalcResult<V> {
-  const values = new Map(state.values);
-  const changed = new Set(dirty);
+function propagate<V>(state: CalcState<V> & { values: Map<string, V> }, order: readonly string[], dirty: ReadonlySet<string>): CalcResult<V> {
+  const { values } = state;
   const recalculated: string[] = [];
   const get = (id: string) => values.get(id);
-  const precedents = precedentsLookup(state.graph);
+
+  // A node needs recomputing iff one of its precedents changed, ie. it is a
+  // dependent of a changed node. Tracking this as nodes change avoids
+  // building a reverse index of the whole graph.
+  const triggered = new Set<string>();
+  const markChanged = (id: string) => {
+    for (const d of dependentsOf(state.graph, id)) triggered.add(d);
+  };
+  for (const id of dirty) markChanged(id);
 
   for (const id of order) {
     const formula = state.formulas.get(id);
     if (formula === undefined)
       continue;
     // Only recompute if at least one precedent really changed
-    if (!precedents(id).some(p => changed.has(p)))
+    if (!triggered.has(id))
       continue;
 
     const next = formula(get);
@@ -303,9 +323,9 @@ function propagate<V>(state: CalcState<V>, order: readonly string[], dirty: Read
     const previous = values.get(id);
     values.set(id, next);
     if (!had || !state.equals(previous as V, next))
-      changed.add(id);
+      markChanged(id);
   }
-  return { state: { ...state, values }, recalculated };
+  return { state, recalculated };
 }
 
 /**
@@ -321,8 +341,9 @@ export function setValue<V>(state: CalcState<V>, id: string, value: V): CalcResu
   const graphWithNode = addNode(state.graph, id);
   const had = state.values.has(id);
   const unchanged = had && state.equals(state.values.get(id) as V, value);
+  // Fresh copy, so propagate can update it in place
   const values = new Map(state.values).set(id, value);
-  const next: CalcState<V> = { ...state, graph: graphWithNode, values };
+  const next = { ...state, graph: graphWithNode, values };
   if (unchanged)
     return { state: next, recalculated: [] };
   return propagate(next, recalculationOrder(graphWithNode, [id]), new Set([id]));
@@ -354,7 +375,8 @@ export function setFormula<V>(state: CalcState<V>, id: string, precedents: reado
     values.set(n, f(get));
     recalculated.push(n);
   }
-  const after: CalcState<V> = { ...base, values };
+  // `values` is a fresh copy, so propagate can update it in place
+  const after = { ...base, values };
 
   // If value of this node changed, propagate to dependents
   const had = state.values.has(id);

@@ -1,6 +1,6 @@
 import type { DirectedGraph, Edge, Vertex } from "./directed-graph.js";
 import { resultThrow } from "@ixfx/guards";
-import { immutable as immutableMap } from "../map/map.js";
+import { immutableFromOwned } from "../map/map.js";
 import { graphTest, resolveVertex } from "./directed-graph-internal.js";
 
 /**
@@ -181,5 +181,5 @@ export function transpose(graph: DirectedGraph): DirectedGraph {
 
   const m = new Map<string, Vertex>();
   for (const [id, out] of outs) m.set(id, { id, out });
-  return { ...graph, vertices: immutableMap(m) };
+  return { ...graph, vertices: immutableFromOwned(m) };
 }
