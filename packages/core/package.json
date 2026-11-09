@@ -1,7 +1,7 @@
 {
   "name": "@ixfx/core",
   "type": "module",
-  "version": "0.56.19",
+  "version": "0.56.20",
   "publishConfig": {
     "access": "public",
     "exports": {

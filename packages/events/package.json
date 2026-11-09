@@ -1,6 +1,6 @@
 {
   "name": "@ixfx/events",
-  "version": "0.56.19",
+  "version": "0.56.20",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
